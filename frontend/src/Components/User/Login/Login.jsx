@@ -1,15 +1,15 @@
-import React,{useState} from 'react';
+import React,{useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useDispatch,useSelector} from 'react-redux'
 import { ToastContainer, toast } from 'react-toastify';
 import { userLogin,
   forgotPassword,
-  forgotPasswordVerify
-} from '../../actions/UserActions';
+  forgotPasswordVerify,
+  userGoogleLogin
+} from '../../../actions/UserActions';
 import {
   Card,
   Input,
-  Checkbox,
   Button,
   Typography,
   CardHeader,
@@ -17,6 +17,8 @@ import {
 } from "@material-tailwind/react";
 
 import 'react-toastify/dist/ReactToastify.css'
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from 'axios';
 
 function LogIn() {
     const navigate=useNavigate()
@@ -37,6 +39,7 @@ function LogIn() {
     const [reset, setReset] = useState(false);
     const [otpSent, setSentOtp] = useState(false);
     const [otp, setOtp] = useState("");
+    const [user, setUser] = useState([]);
 
     const handleOtp= async(e)=>{
       e.preventDefault();
@@ -59,10 +62,17 @@ function LogIn() {
             }else{
                 const response= await dispatch(userLogin(email,password))
                 console.log(response);
-                toast(response.response.data.alert)
+                if(response.response){
+                  toast(response.response.data.alert)
+                }
                 if(response.status){
-                  localStorage.setItem('token',response.token)
-                  navigate('/')
+                  if (response.user.is_manager) {
+                    localStorage.setItem('managerToken',response.token)
+                    navigate('/manager/home');
+                  } else {
+                    localStorage.setItem('token',response.token)
+                    navigate('/')
+                  }
                 }
             }
         }catch(err){
@@ -79,11 +89,47 @@ function LogIn() {
       if (forgotPasswordData.message.status) {
         setReset(false);
         setSentOtp(false);
-        GenerateError('Your password reset succefully')
+        setValue('')
+        toast('Your password reset succefully')
       } else {
         setSentOtp(false);
       }
     };
+
+    const login = useGoogleLogin({
+      onSuccess: (codeResponse) => {
+        setUser(codeResponse)
+        GoogleAuth()
+      },
+      onError: (error) => console.log('Login Failed:', error),
+  })
+
+  const GoogleAuth=async()=>{
+    try {
+      if (user) {
+        const res = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+                headers: {
+                    Authorization: `Bearer ${user.access_token}`,
+                    Accept: 'application/json'
+                }
+            })
+            console.log(res.data);
+        const result=await dispatch(userGoogleLogin(res.data))
+        console.log(result);
+        if(result.status){
+          localStorage.setItem('token',result.token)
+          if(result.is_manager){
+            navigate('/manager/home/')
+          }else{
+            navigate('/')
+          }
+        }
+        console.log(result);
+    }
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
 
   return (
@@ -111,7 +157,7 @@ function LogIn() {
           {otpSent?<form className="mt-8 mb-2 w-full max-w-[48rem] sm:w-[24rem]" onSubmit={handleForgot}>
             <div className="mb-4 flex flex-col gap-6">
               <Input size="lg" name='otp' onChange={(e) => setOtp(e.target.value)} value={otp} label="OTP" />
-              <Input size="lg" name='password' value={value.password} onChange={(e) => setValue({...value,[e.target.name]:e.target.value})} label="Pass" />
+              <Input size="lg" type='password' name='password' value={value.password} onChange={(e) => setValue({...value,[e.target.name]:e.target.value})} label="Pass" />
             </div>
             <Button className="mt-6" fullWidth type='submit'>
               Verify
@@ -137,7 +183,7 @@ function LogIn() {
               <Input size="lg" name='email' value={value.email} onChange={(e)=>setValue({...value,[e.target.name]:e.target.value})} label="Email" />
               <Input type="password" name='password' value={value.password} onChange={(e)=>setValue({...value,[e.target.name]:e.target.value})} size="lg" label="Password" />
             </div>
-            <Button
+            {/* <Button
               size="lg"
               variant="outlined"
               color="blue-gray"
@@ -145,7 +191,19 @@ function LogIn() {
             >
               <img src="https://w7.pngwing.com/pngs/989/129/png-transparent-google-logo-google-search-meng-meng-company-text-logo-thumbnail.png" alt="metamask" className="h-6 w-6" />
               Continue with Google
+            </Button> */}
+            <div>
+            <Button
+              size="lg"
+              variant="outlined"
+              color="blue-gray"
+              className="flex items-center gap-3"
+              onClick={()=>login()}
+            >
+              <img src="https://www.pngall.com/wp-content/uploads/13/Google-Logo-PNG-Images.png" alt="metamask" className="h-6 w-6" />
+              Continue with Google
             </Button>
+            </div>
             {/* <Checkbox
               label={
                 <Typography
@@ -165,7 +223,7 @@ function LogIn() {
               containerProps={{ className: '-ml-2.5' }}
             /> */}
             <Button className="mt-6" fullWidth type='submit'>
-              Register
+              Login
             </Button>
             <Typography color="gray" className="mt-4 text-center font-normal">
               <a href="#" className="font-medium text-gray-900" onClick={()=>setReset(true)}>
@@ -175,7 +233,13 @@ function LogIn() {
             <Typography color="gray" className="mt-4 text-center font-normal">
               Already have an account?{' '}
               <a onClick={()=>navigate('/signup')} className="font-medium text-gray-900">
-                Sign In
+                Sign Up
+              </a>
+            </Typography>
+            <Typography color="gray" className="mt-4 text-center font-normal">
+              Like to become a Seller?{' '}
+              <a onClick={()=>navigate('/manager/signup')} className="font-medium text-gray-900">
+                Sign Up
               </a>
             </Typography>
           </form>

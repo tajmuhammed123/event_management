@@ -35,6 +35,10 @@ app.use(cors({
 
 const userRouter=require('./Routes/userRoutes')
 app.use('/',userRouter)
+const adminRouter=require('./Routes/adminRoutes')
+app.use('/admin/',adminRouter)
+const managerRouter=require('./Routes/mangerRoutes')
+app.use('/manager/',managerRouter)
 
 app.listen(4000,()=>{
     console.log('server running at 4000')

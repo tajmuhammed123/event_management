@@ -8,7 +8,7 @@ import {
     USER_LOGOUT,
     RESET_PASSWORD_FAIL,
     RESET_PASSWORD_REQUEST,
-    RESET_PASSWORD_SUCCESS
+    RESET_PASSWORD_SUCCESS,
 } from '../Constants/userConstants'
 
 export const userRegisterReducer = (state = { loading: false, user: {}, error: null }, action) => {

@@ -21,7 +21,7 @@ const userReg = async (req,res)=>{
         console.log(name,email,password,mob);
         const exists=await User.findOne({email:email})
         if(exists){
-            res.status(400).json({status: false,message:'Email already in used'});
+            return res.status(400).json({status: false,message:'Email already in used'});
         }
         const hash = await bcrypt.hash(password,10)
         const newUser =  new User({
@@ -57,22 +57,79 @@ const userLogin = async (req, res) => {
             if (access) {
                 console.log('user logined');
 
-                let token = await Tokenmodel.findOne({ userId: exists._id });
-                console.log(token);
-                if (!token) {
-                    console.log('hjkgh');
-                    token = await new Tokenmodel({
-                        userId: exists._id,
-                        token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
-                    });
-                    await token.save();
+                if(exists.is_manager){
+                    let token = await Tokenmodel.findOne({ userId: exists._id });
+                    console.log(token);
+                    if (!token) {
+                        console.log('hjkgh');
+                        token = await new Tokenmodel({
+                            userId: exists._id,
+                            token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
+                        });
+                        await token.save();
+                    }
+                    
+                    return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true, is_manager:true });
+                }else{
+                    let token = await Tokenmodel.findOne({ userId: exists._id });
+                    console.log(token);
+                    if (!token) {
+                        console.log('hjkgh');
+                        token = await new Tokenmodel({
+                            userId: exists._id,
+                            token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
+                        });
+                        await token.save();
                 }
                 
-                return res.status(200).json({ user: exists, token: token, alert: 'Login', status: true });
+                return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true, is_manager:false });
+                }
             } else {
                 return res.status(404).json({ alert: "Password is wrong", status: false });
             }
         }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const userGoogleLogin=async(req,res)=>{
+    try {
+        const { name,email, password } = req.body
+        const exists=await User.findOne({email:email})
+
+        if (exists) {
+          let token = await Tokenmodel.findOne({ userId: exists._id });
+        
+          if (!token) {
+            token = new Tokenmodel({
+              userId: exists._id,
+              token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 }),
+            });
+          } else {
+            token.token = jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 });
+          }
+        
+          await token.save();
+          return res.status(200).json({ token: token, user: exists, alert: 'Registered', status: true });
+        }
+        
+        const hash = await bcrypt.hash(password,10)
+        const newUser =  new User({
+          name,
+          email,
+          mob: 1111111111,
+          password:hash,
+          is_manager:false
+       })
+    
+        let user =  await newUser.save().then(console.log("Registered"))
+        const token=await new Tokenmodel ({
+            userId:user._id,
+            token:jwt.sign({ userId: user._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
+          });
+          await token.save()
+        return res.status(200).json({ token: token,user:newUser, alert:'Registred', status: true});
     } catch (error) {
         console.log(error.message);
     }
@@ -136,6 +193,7 @@ const VerifyPassword=async(req,res)=>{
 module.exports={
     userReg,
     userLogin,
+    userGoogleLogin,
     forgotPassword,
     VerifyPassword
 }

@@ -40,7 +40,8 @@
 .main {
   display: flex;
   height: 100vh;
-  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
   
 }
 
@@ -50,6 +51,8 @@
   transition: width 0.3s ease;
   z-index: 1000; 
   height: 100vh;/* Use CSS transition for smooth animation */
+  overflow: hidden;
+  position: fixed;
 }
 
 .sidebar.open {
@@ -75,16 +78,30 @@
   transition: margin-left 0.3s ease; /* Use transition for smooth animation */
   z-index: 900;
   width: 100%;
-  flex-grow: 1; /* Make content area take available space */
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
 }
 
 .content.open {
   margin-left: 60px; /* Adjust margin when sidebar is open */
 }
 
+@media (max-width: 650px) {
+  .main-content{
+    margin: 20px !important;
+    padding-right: 20px;
+  }
+}
 
+.custom-avatar {
+  min-height: 50px;
+  min-width: 50px;
+  height: 50px !important;
+  width: 50px !important; 
+}
 
-
+.sticky {
+  position: sticky !important;
+  z-index: 10;
+  background-color: white;
+}

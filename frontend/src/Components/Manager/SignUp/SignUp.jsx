@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { userReg } from '../../actions/UserActions';
+import { userReg } from '../../../actions/UserActions';
 import { ToastContainer, toast } from 'react-toastify';
 import {
   Card,
@@ -15,8 +15,9 @@ import {
 import './SignUp.css';
 
 import 'react-toastify/dist/ReactToastify.css'
+import { managerReg } from '../../../actions/ManagerActions';
 
-function SignUp() {
+function ManagerSignUp() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [value, setValue] = useState({
@@ -43,17 +44,13 @@ function SignUp() {
       } else if (!password) {
         GenerateError('Your password cannot be null')
       } else {
-        const response = await dispatch(userReg(name, mob, email, password));
-        toast(response.response.data.alert)
+        const response = await dispatch(managerReg(name, mob, email, password));
         console.log(response);
         if (response.status) {
-          if (response.user.is_manager) {
-            navigate('/manager');
-          } else {
-            navigate('/');
-          }
+            localStorage.setItem('managerToken',response.token)
+            navigate('/manager/home/');
         } else {
-          navigate('/signup');
+          navigate('/manager/signup');
         }
       }
     } catch (err) {
@@ -126,4 +123,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default ManagerSignUp;

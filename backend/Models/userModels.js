@@ -20,6 +20,10 @@ const userSchema=new mongoose.Schema({
     is_manager:{
         type:Boolean,
         required:true
+    },
+    is_admin:{
+        type:Boolean,
+        default:false
     }
 })
 

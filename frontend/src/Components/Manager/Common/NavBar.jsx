@@ -3,7 +3,6 @@
 import React from 'react';
 import {
   Navbar,
-  MobileNav,
   Typography,
   Button,
   MenuHandler,
@@ -25,7 +24,7 @@ import {
   PowerIcon,
 } from "@heroicons/react/24/outline";
 import { useDispatch } from 'react-redux';
-import { LogoutDetails } from '../../actions/UserActions';
+import { LogoutDetails } from '../../../actions/ManagerActions';
 
  
 // profile menu component
@@ -39,14 +38,17 @@ function ProfileMenu() {
     dispatch(
       LogoutDetails()
     );
-    navigate("/");
+    navigate("/login/");
     setIsMenuOpen(false)
 
   };
 
+  const managerInfoString = localStorage.getItem("managerInfo");
+
+  const managerInfo = JSON.parse(managerInfoString)
   const profileMenuItems = [
     {
-      label: "My Profile",
+      label: `${managerInfo.user.name}`,
       icon: UserCircleIcon,
     },
     {
@@ -67,7 +69,6 @@ function ProfileMenu() {
       onclick: ()=>{handleLogOut()}
     },
   ];
-
  
   const closeMenu = () => setIsMenuOpen(false);
  
@@ -186,16 +187,10 @@ export function StickyNavbar() {
     <div>
     <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none py-2 px-4 lg:px-8 lg:py-4">
       <div className="flex items-center justify-between text-blue-gray-900">
-        <Typography
-          as="a"
-          href="#"
-          className="mr-4 cursor-pointer py-1.5 font-medium"
-        >
-          EVENT MANAGEMENT
-        </Typography>
+        <img src="/Images/Extrano black.PNG" alt="Extrano" className='w-10' style={{width:'60px'}} />
         <div className="flex items-center gap-4">
           <div className="mr-4 hidden lg:block">{navList}</div>
-          {localStorage.getItem("userInfo") ? <ProfileMenu/> : 
+          {localStorage.getItem("managerInfo") ? <ProfileMenu/> : 
           <Button
           variant="gradient"
           size="sm"

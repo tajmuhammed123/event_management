@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
     USER_REGISTER_REQUEST,
     USER_REGISTER_FAIL,
@@ -9,7 +8,10 @@ import {
     RESET_PASSWORD_REQUEST,
     RESET_PASSWORD_FAIL,
     RESET_PASSWORD_SUCCESS,
-    USER_LOGOUT
+    USER_LOGOUT,
+    USER_GOOGLE_LOGIN_REQUEST,
+    USER_GOOGLE_LOGIN_SUCCESS,
+    USER_GOOGLE_LOGIN_FAIL,
 } from '../Constants/userConstants'
 
 import { axiosUserInstance } from "../Constants/axios";
@@ -70,7 +72,12 @@ export const userLogin= (email, password)=>async(dispatch)=>{
             config
           );
           console.log(data);
-          localStorage.setItem("userInfo", JSON.stringify(data));
+          if(data.is_manager){
+            localStorage.setItem("managerInfo", JSON.stringify(data));
+          }else{
+            localStorage.setItem("userInfo", JSON.stringify(data));
+          }
+          
           dispatch({
             type: USER_LOGIN_SUCCESS,
             payload: data,
@@ -79,6 +86,47 @@ export const userLogin= (email, password)=>async(dispatch)=>{
     } catch (error) {
         dispatch({
             type: USER_LOGIN_FAIL,
+            payload:
+              error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message,
+          })
+          return error
+    }
+}
+export const userGoogleLogin= (value)=>async(dispatch)=>{
+    try {
+      console.log('heyy');
+      console.log(value);
+        dispatch({
+            type: USER_GOOGLE_LOGIN_REQUEST,
+          });
+    
+          const config = {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+          const values = {
+            name: value.given_name,
+            email: value.email,
+            password: value.id,
+        }
+    
+          const { data } = await axiosUserInstance.post(
+            "/googlelogin", values ,
+            config
+          );
+          console.log(data);
+          localStorage.setItem("userInfo", JSON.stringify(data));
+          dispatch({
+            type: USER_GOOGLE_LOGIN_SUCCESS,
+            payload: data,
+          });
+          return data
+    } catch (error) {
+        dispatch({
+            type: USER_GOOGLE_LOGIN_FAIL,
             payload:
               error.response && error.response.data.message
                 ? error.response.data.message
