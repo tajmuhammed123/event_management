@@ -44,6 +44,97 @@ const managerReg = async (req,res)=>{
     }
 }
 
+const managerLogin=async(req,res)=>{
+    try {
+        const { email, password } = req.body;
+        console.log(email, password);
+        
+        const exists = await Manager.findOne({ email: email });
+        console.log(exists);
+        
+        if (exists) {
+            const access = await bcrypt.compare(password, exists.password);
+            
+            if (access) {
+                console.log('user logined');
+                    let token = await Tokenmodel.findOne({ userId: exists._id });
+                    console.log(token);
+                    if (!token) {
+                        console.log('hjkgh');
+                        token = await new Tokenmodel({
+                            userId: exists._id,
+                            token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
+                        });
+                        await token.save();
+                }
+                
+                return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true });
+            } else {
+                return res.status(404).json({ alert: "Password is wrong", status: false });
+            }
+        }else{
+            return res.status(404).json({ alert: "User Not Found", status: false })
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const forgotPassword=async(req,res)=>{
+    try {
+        const { email } = req.body;
+        console.log(email);
+        const exists = await Manager.findOne({ email: email });
+        if(exists){
+            await Tokenmodel.findOneAndDelete({
+                userId: exists._id
+              });
+        
+              const OTP = generateOtp();
+              const tokenmodel=new Tokenmodel({
+                userId: exists._id,
+                token: OTP
+              });
+              let subject= "Verify your email account"
+              let text=`<div>
+              <h1>OTP for reset password</h1>
+              <p>${OTP}</p>
+              <strong>Do not share your otp</strong>
+              </div>`
+              await sendEmail(exists.email,subject,text)
+              await tokenmodel.save()
+              await exists.save()
+              console.log('returned');
+              return res.status(200).json({message:"Success",status:true});
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const VerifyPassword=async(req,res)=>{
+    try {
+        const { email, otp, password } = req.body;
+        const manager = await Manager.findOne({ email: email });
+        console.log(manager);
+        const token = await Tokenmodel.findOne({ userId: manager._id });
+        console.log(token);
+        if(otp===token.token){
+            const hash = await bcrypt.hash(password,10)
+            manager.password = hash;
+            await manager.save();
+            console.log();
+            await Tokenmodel.findOneAndDelete({ userId: manager._id });
+            res.status(200).json({message:"Success",status:true});
+        }else{
+            await Tokenmodel.findOneAndDelete({ userId: manager._id });
+            res.status(200).json({message:"Failed",status:false});
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const eventData=async(req,res)=>{
     try {
         console.log('entered');
@@ -72,5 +163,8 @@ const eventData=async(req,res)=>{
 
 module.exports={
     managerReg,
-    eventData
+    eventData,
+    managerLogin,
+    forgotPassword,
+    VerifyPassword
 }

@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { userReg } from '../../../actions/UserActions';
+import { Form, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import {
-  Card,
   Input,
   Checkbox,
   Button,
   Typography,
-  CardHeader,
   CardBody,
   Textarea,
   TabPanel,
@@ -36,7 +33,9 @@ function ManagerSignUp() {
     team_name: '',
     salutation: '',
     about: '',
+    cover_image:'',
     events: {},
+    multipleImages:[],
     location: '',
     dishes: '',
   });
@@ -67,6 +66,18 @@ function ManagerSignUp() {
   setEventData({...eventdata,events})
   }
 
+  const handleImages= async(e)=>{
+    console.log('jhvg');
+    const multipleImages=[]
+    const files = Array.from(e.target.files);
+    files.forEach((file) => {
+      multipleImages.push(file);
+    })
+    console.log('Selected files:', multipleImages);
+    console.log(multipleImages);
+    setEventData({...eventdata,multipleImages})
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -76,7 +87,6 @@ function ManagerSignUp() {
       } else if (!password) {
         GenerateError('Your password cannot be null')
       } else {
-        
         console.log(value,eventdata);
         const response= await dispatch(managerReg(value,eventdata))
         console.log(response);
@@ -160,7 +170,7 @@ function ManagerSignUp() {
               </Button>
               <Typography color="gray" className="mt-4 text-center font-normal">
                 Already have an account?{' '}
-                <a href="#" onClick={()=>navigate('/login')} className="font-medium text-gray-900">
+                <a href="#" onClick={()=>navigate('/manager/')} className="font-medium text-gray-900">
                   Sign In
                 </a>
               </Typography>
@@ -176,6 +186,18 @@ function ManagerSignUp() {
                 <Input size="lg" label="Salutation" name='salutation' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
                 </div>
             <Textarea size="lg" label="About" name='about' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
+                <div className='flex flex-wrap w-20'>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add cover image</label>
+                <input name='cover_image' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file"></input>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add Multiple images</label>
+                <input
+        onChange={handleImages}
+        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+        id="file_input"
+        type="file"
+        multiple
+      />
+                </div>
             <div className='flex flex-wrap w-full'>
             <Checkbox
             name='wedding'

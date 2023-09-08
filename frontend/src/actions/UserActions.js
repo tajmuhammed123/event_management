@@ -72,11 +72,7 @@ export const userLogin= (email, password)=>async(dispatch)=>{
             config
           );
           console.log(data);
-          if(data.is_manager){
-            localStorage.setItem("managerInfo", JSON.stringify(data));
-          }else{
-            localStorage.setItem("userInfo", JSON.stringify(data));
-          }
+          localStorage.setItem("userInfo", JSON.stringify(data));
           
           dispatch({
             type: USER_LOGIN_SUCCESS,
