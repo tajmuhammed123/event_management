@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { SidebarWithCta } from '../Common/SideBar';
 import { StickyNavbar } from '../Common/NavBar';
 import './About.css';
 import {   
@@ -121,9 +120,6 @@ function About() {
 
   return (
     <div className='main'>
-      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <SidebarWithCta sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-      </div>
       <div className='content pl-12'>
         <StickyNavbar />
         <div>

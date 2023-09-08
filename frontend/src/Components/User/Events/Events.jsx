@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { SidebarWithCta } from '../Common/SideBar';
 import { StickyNavbar } from '../Common/NavBar';
 import {   
   Typography,
@@ -47,9 +46,6 @@ function Events() {
 
   return (
     <div className='main'>
-      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <SidebarWithCta sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-      </div>
       <div className='content pl-12'>
         <StickyNavbar className="sticky"  />
         <div>

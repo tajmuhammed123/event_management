@@ -28,8 +28,7 @@ const userReg = async (req,res)=>{
           name,
           email,
           mob,
-          password:hash,
-          is_manager:false
+          password:hash
        })
     
         let user =  await newUser.save().then(console.log("Registered"))
@@ -69,7 +68,7 @@ const userLogin = async (req, res) => {
                         await token.save();
                     }
                     
-                    return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true, is_manager:true });
+                    return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true });
                 }else{
                     let token = await Tokenmodel.findOne({ userId: exists._id });
                     console.log(token);
@@ -82,7 +81,7 @@ const userLogin = async (req, res) => {
                         await token.save();
                 }
                 
-                return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true, is_manager:false });
+                return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true });
                 }
             } else {
                 return res.status(404).json({ alert: "Password is wrong", status: false });

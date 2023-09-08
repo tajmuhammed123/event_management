@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { SidebarWithCta } from '../Common/SideBar';
 import { StickyNavbar } from '../Common/NavBar';
 import './Home.css';
 import { useNavigate } from 'react-router-dom';
@@ -16,10 +15,7 @@ function Home() {
 
   return (
     <div className='main'>
-      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <SidebarWithCta sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-      </div>
-      <div className='content pl-12'>
+      <div className='content'>
         <StickyNavbar className="sticky"  />
         <div>
           <div className='background-container'>

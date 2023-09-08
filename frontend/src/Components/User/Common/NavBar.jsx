@@ -10,7 +10,9 @@ import {
   Avatar,
   MenuList,
   MenuItem,
-  Collapse
+  Collapse,
+  Drawer,
+  IconButton
 } from '@material-tailwind/react';
 
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +27,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useDispatch } from 'react-redux';
 import { LogoutDetails } from '../../../actions/UserActions';
+import Sidebar from './SideBar.jsx'
 
  
 // profile menu component
@@ -183,11 +186,45 @@ export function StickyNavbar() {
     </ul>
   );
 
+  const [open, setOpen] = React.useState(false);
+  const openDrawer = () => setOpen(true);
+  const closeDrawer = () => setOpen(false);
+
   return (
     <div>
-    <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none py-2 px-4 lg:px-8 lg:py-4">
+      <Drawer open={open} onClose={closeDrawer}>
+      <div className="mb-2 flex items-center justify-between p-4">
+          <Typography variant="h5" color="blue-gray">
+            Side Menu
+          </Typography>
+          <IconButton variant="text" color="blue-gray" onClick={closeDrawer}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="h-5 w-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </IconButton>
+        </div>
+          <Sidebar/>
+        </Drawer>
+    <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none py-2 px-4 lg:pr-8 lg:pl-6 lg:py-4">
       <div className="flex items-center justify-between text-blue-gray-900">
+        <div className='flex align-middle justify-between'>
+        <svg onClick={openDrawer} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-9 w-9 lg:h-12  lg:pr-2">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
         <img src="/Images/Extrano black.PNG" alt="Extrano" className='w-10' style={{width:'60px'}} />
+        </div>
+        
         <div className="flex items-center gap-4">
           <div className="mr-4 hidden lg:block">{navList}</div>
           {localStorage.getItem("userInfo") ? <ProfileMenu/> : 

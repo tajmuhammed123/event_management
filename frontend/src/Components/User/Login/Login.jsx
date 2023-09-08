@@ -66,13 +66,8 @@ function LogIn() {
                   toast(response.response.data.alert)
                 }
                 if(response.status){
-                  if (response.user.is_manager) {
-                    localStorage.setItem('managerToken',response.token)
-                    navigate('/manager/home');
-                  } else {
                     localStorage.setItem('token',response.token)
                     navigate('/')
-                  }
                 }
             }
         }catch(err){
@@ -118,11 +113,7 @@ function LogIn() {
         console.log(result);
         if(result.status){
           localStorage.setItem('token',result.token)
-          if(result.is_manager){
-            navigate('/manager/home/')
-          }else{
             navigate('/')
-          }
         }
         console.log(result);
     }

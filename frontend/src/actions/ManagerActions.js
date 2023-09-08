@@ -1,6 +1,8 @@
 
-
 import { 
+    MANAGER_EVENT_DATA_FAIL,
+    MANAGER_EVENT_DATA_REQUEST,
+    MANAGER_EVENT_DATA_SUCCESS,
     MANAGER_LOGOUT, 
     MANAGER_REGISTER_FAIL, 
     MANAGER_REGISTER_REQUEST, 
@@ -8,7 +10,7 @@ import {
     } from "../Constants/ManagerConstants";
 import { axiosManagerInstance } from "../Constants/axios";
 
-export const managerReg= (name, mob, email, password)=>async(dispatch)=>{
+export const managerReg= (value,eventdata)=>async(dispatch)=>{
     try {
         dispatch({
             type: MANAGER_REGISTER_REQUEST,
@@ -22,7 +24,7 @@ export const managerReg= (name, mob, email, password)=>async(dispatch)=>{
     
           const { data } = await axiosManagerInstance.post(
             "/signup",
-            { name, mob, email, password },
+            { value,eventdata },
             config
           );
           console.log(data.status);
@@ -55,3 +57,39 @@ export const LogoutDetails = ()=> async (dispatch)=>{
       console.log(error.message);
     }
   }
+
+export const managerDetailReg = (name,salutation,about,events,location,dishes)=>async(dispatch)=>{
+    try {
+
+      const tokenId = JSON.parse(localStorage.getItem("managerInfo"))
+        dispatch({
+            type: MANAGER_EVENT_DATA_REQUEST,
+            Authorization: `Bearer ${tokenId.token}`
+        })
+
+        const config={
+          headers: {
+            "Content-Type":"application/json"
+          }
+        }
+        console.log({name,salutation,about,events,location,dishes});
+        console.log(tokenId.user._id);
+        const {data} =await axiosManagerInstance.post(
+         `/eventdata/${tokenId.user._id}`,
+          {name,salutation,about,events,location,dishes},
+          config
+        )
+
+        dispatch({
+          type: MANAGER_EVENT_DATA_SUCCESS,
+          payload:data
+        })
+        return data                                                                                                                                                                                                                                                                                                                             
+    } catch (error) {
+      dispatch({
+        type: MANAGER_EVENT_DATA_FAIL,
+        payload:error
+      })
+      return error
+    }
+}
