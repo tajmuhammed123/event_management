@@ -73,8 +73,6 @@ function ProfileMenu() {
     },
   ];
  
-  const closeMenu = () => setIsMenuOpen(false);
- 
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -222,7 +220,7 @@ export function StickyNavbar() {
         <svg onClick={openDrawer} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-9 w-9 lg:h-12  lg:pr-2">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-        <img src="/Images/Extrano black.PNG" alt="Extrano" className='w-10' style={{width:'60px'}} />
+        <img src="/Logo/AX_BLACK.png" alt="Extrano" className='w-10' style={{width:'60px'}} />
         </div>
         
         <div className="flex items-center gap-4">

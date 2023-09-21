@@ -9,7 +9,7 @@ import {
   ForgotPasswordReducer,
 } from "./reducers/userReducer";
 import { adminLoginReducer } from "./reducers/AdminReducer";
-import { managerRegisterReducer } from "./reducers/ManagerReducer";
+import { managerLoginReducer, managerRegisterReducer } from "./reducers/ManagerReducer";
 
 // Combine your reducers
 const combinedReducers = combineReducers({
@@ -17,14 +17,15 @@ const combinedReducers = combineReducers({
   userLogin: userLoginReducer,
   forgotPassword: ForgotPasswordReducer,
   adminLogin: adminLoginReducer,
-  managerRegister:managerRegisterReducer
+  managerRegister:managerRegisterReducer,
+  managerInfo:managerLoginReducer
 });
 
 // Define the persist configuration
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["userRegister", "userLogin", "forgotPassword","adminLogin","managerRegister"],
+  whitelist: ["userRegister", "userLogin", "forgotPassword","adminLogin","managerRegister","managerInfo"],
 };
 
 // Create the persisted reducer

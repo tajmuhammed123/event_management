@@ -73,8 +73,6 @@ function ProfileMenu() {
     },
   ];
  
-  const closeMenu = () => setIsMenuOpen(false);
- 
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>

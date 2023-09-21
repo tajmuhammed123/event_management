@@ -45,13 +45,7 @@ function SignUp() {
       } else {
         const response = await dispatch(userReg(name, mob, email, password));
         console.log(response);
-        if (response.status) {
-          if (response.user.is_manager) {
-            navigate('/');
-          }
-        } else {
-          navigate('/signup');
-        }
+          navigate('/');
       }
     } catch (err) {
       console.log(err.message);

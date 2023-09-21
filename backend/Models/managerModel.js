@@ -14,6 +14,14 @@ const evetDataSchema=new mongoose.Schema({
         type:String,
         required:true
     },
+    cover_image:{
+        type:String,
+        required:true
+    },
+    multipleImages:{
+        type:Array,
+        required:true
+    },
     events:{
         type:Object,
         required:true
@@ -46,6 +54,10 @@ const managerSchema=new mongoose.Schema({
         required:true
     },
     is_verified:{
+        type:Boolean,
+        default:false
+    },
+    is_authorized:{
         type:Boolean,
         default:false
     },

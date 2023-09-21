@@ -1,4 +1,6 @@
 const User=require('../Models/userModels')
+const Manager=require('../Models/managerModel')
+const Booking=require('../Models/bookingData')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -55,33 +57,23 @@ const userLogin = async (req, res) => {
             
             if (access) {
                 console.log('user logined');
-
-                if(exists.is_manager){
+                if(exists.is_verified){
                     let token = await Tokenmodel.findOne({ userId: exists._id });
                     console.log(token);
                     if (!token) {
-                        console.log('hjkgh');
                         token = await new Tokenmodel({
                             userId: exists._id,
                             token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
                         });
                         await token.save();
                     }
-                    
-                    return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true });
-                }else{
-                    let token = await Tokenmodel.findOne({ userId: exists._id });
-                    console.log(token);
-                    if (!token) {
-                        console.log('hjkgh');
-                        token = await new Tokenmodel({
-                            userId: exists._id,
-                            token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
-                        });
-                        await token.save();
-                }
                 
                 return res.status(200).json({ user: exists, token: token, alert: 'Logined', status: true });
+                }else{
+                    let subject='Email Verification'
+                    let text='<p>Hii' + exists.name + ', Please click here to <a href="http://localhost:3000/verifyemail/' + exists._id + '"> Verify </a> your mail.</p>'
+                    sendEmail(email,subject,text)
+                    return res.status(200).json({ alert: 'Check your Email and Verify', status: false });
                 }
             } else {
                 return res.status(404).json({ alert: "Password is wrong", status: false });
@@ -119,7 +111,8 @@ const userGoogleLogin=async(req,res)=>{
           email,
           mob: 1111111111,
           password:hash,
-          is_manager:false
+          is_manager:false,
+          is_verified:true
        })
     
         let user =  await newUser.save().then(console.log("Registered"))
@@ -131,6 +124,27 @@ const userGoogleLogin=async(req,res)=>{
         return res.status(200).json({ token: token,user:newUser, alert:'Registred', status: true});
     } catch (error) {
         console.log(error.message);
+    }
+}
+
+const VerifyEmail=async(req,res)=>{
+    try {
+        const user= req.query.id
+        const userData=await User.findOne({_id:user})
+        console.log(userData);
+        await User.findOneAndUpdate({_id:user},{$set:{is_verified:true}},{upsert:true})
+        let token = await Tokenmodel.findOne({ userId: user });
+        console.log(token);
+        if (!token) {
+            token = await new Tokenmodel({
+                userId: user,
+                token: jwt.sign({ userId: user }, process.env.JwtSecretKey, { expiresIn: 60000 })
+            });
+            await token.save();
+        }
+        return res.status(200).json({ user: userData, token: token, alert: 'Verified Logined', status: true });
+    } catch (error) {
+        console.log(error);
     }
 }
 
@@ -189,10 +203,88 @@ const VerifyPassword=async(req,res)=>{
     }
 }
 
+const homeData=async(req,res)=>{
+    try {
+        const homeData=await Manager.find({is_authorized:true, eventData: { $exists: true, $ne: null }})
+        console.log(homeData);
+        return res.status(200).json({homeData})
+    } catch (error) {
+        
+    }
+}
+
+const detailData=async(req,res)=>{
+    try {
+        const id = req.query.id
+        console.log(id);
+        const detailData=await Manager.findById(id)
+        console.log(detailData);
+        const result=detailData.eventData
+        return res.status(200).json({result})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const eventList=async(req,res)=>{
+    try {
+        const name=req.query.name
+        const managers = await Manager.find({
+            [`eventData.events.${name}`]: 'true'
+          },{ 'eventData': 1, '_id': 0 });
+          return res.status(200).json({managers})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const managerData=async(req,res)=>{
+    try {
+        const id=req.params.id
+        const manager=await Manager.findById(id)
+        console.log(manager);
+        return res.status(200).json({data:manager, status:true})
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const submitBooking=async(req,res)=>{
+    try {
+        console.log(req.body);
+        const data=req.body.eventdata
+        const booking= new Booking({
+            manager_id: data.manager_id,
+            user_id: data.user_id,
+            name: data.name,
+            event_name: data.event_name,
+            mob: data.mob,
+            event: data.event,
+            preffered_dishes: data.preffered_dishes,
+            address :data.address,
+            date: data.date,
+            time: data.time,
+            additional_data: data.additional_data
+        })
+        await booking.save()
+        console.log(req.body);
+        return res.status(200).json({alert:'Booking saved',status:true})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 module.exports={
     userReg,
     userLogin,
     userGoogleLogin,
+    VerifyEmail,
     forgotPassword,
-    VerifyPassword
+    VerifyPassword,
+    homeData,
+    detailData,
+    eventList,
+    managerData,
+    submitBooking
 }

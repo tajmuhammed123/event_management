@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { StickyNavbar } from '../Common/NavBar';
 import {   
@@ -13,7 +13,8 @@ import {
 } from "@material-tailwind/react"
 
 import { Footer } from '../Common/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { axiosUserInstance } from '../../../Constants/axios';
    
   // function CheckIcon() {
   //   return (
@@ -35,18 +36,30 @@ import { useNavigate } from 'react-router-dom';
   // }
 
 function Events() {
-  // const user = useSelector((state) => state.user);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [data, setData] = useState([]);
+  const {name} = useParams()
+  const homedata=async()=>{
+    try {
+      await axiosUserInstance.get(`/eventlist?name=${name}`)
+      .then((res) => {
+        setData(res.data.managers)
+        console.log(res.data);
+      })
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    console.log(name);
+    homedata()
+    console.log('Component is mounted');
+  },[]);
   const navigate=useNavigate()
-
-  const toggleSidebar = () => {
-    console.log('Toggle sidebar clicked');
-    setSidebarOpen(!sidebarOpen);
-  };
+  console.log(data);
 
   return (
     <div className='main'>
-      <div className='content pl-12'>
+      <div className='content'>
         <StickyNavbar className="sticky"  />
         <div>
           <div className='background-container'>
@@ -195,18 +208,23 @@ function Events() {
               </Button>
             </CardFooter>
           </Card>
-        <Card className="w-full max-w-[17rem] shadow-lg mx-5">
-            <CardHeader floated={false} color="blue-gray">
-              <img
-                src="https://images.unsplash.com/photo-1625076120699-6f53792642b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          {data.map((card,index)=>{
+            const coverImage=`/Images/${card.eventData.cover_image}`
+            const eventlist=Object.keys(card.eventData.events)
+            .filter((key) => card.eventData.events[key] === 'true')
+          return(
+          <Card className="w-full max-w-[17rem] h-[30rem] shadow-lg mx-5" key={index} onClick={()=>navigate(`/detailpage/${card._id}`)}>
+            <CardHeader className='h-[10rem]' floated={false} color="white">
+              <img className='align-middle flex justify-center'
+                src={coverImage}
                 alt="ui/ux review check"
               />
               <div className="to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-tr from-transparent via-transparent to-black/60 " />
             </CardHeader>
-            <CardBody>
+            <CardBody className='h-[15rem]'>
               <div className="mb-3 flex items-center justify-between">
                 <Typography variant="h5" color="blue-gray" className="font-medium">
-                  DREAMERS
+                {card.eventData.team_name}
                 </Typography>
                 <Typography
                   color="blue-gray"
@@ -228,36 +246,59 @@ function Events() {
                 </Typography>
               </div>
               <Typography color="gray">
-                <ul>
-                  <li>Birthdays</li>
-                  <li>Weddings</li>
-                  <li>Competition</li>
-                </ul>
+              <ul>
+                {
+                  eventlist.map((event) => (
+                    <li key={event}>{event}</li>
+                  ))}
+              </ul>
+
               </Typography>
               <div className="group mt-5 inline-flex flex-wrap items-center gap-3">
+              {eventlist.includes('birthday') && (
                 <Tooltip content="Birthdays">
                   <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
                   <img className="h-5 w-5" src="https://icon-library.com/images/cake-icon-png/cake-icon-png-24.jpg" alt="profile-picture" />
                   </span>
-                </Tooltip>
+                </Tooltip>)}
+                {eventlist.includes('wedding') && (
                 <Tooltip content="Weddings">
                   <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/party-icon/party-icon-19.jpg" alt="profile-picture" />
+                  <img className="h-5 w-5" src="https://icon-library.com/images/wedding-ceremony-icon/wedding-ceremony-icon-4.jpg" alt="profile-picture" />
                   </span>
-                </Tooltip>
+                </Tooltip>)}
+                {eventlist.includes('competition') && (
                 <Tooltip content="Competition">
                   <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
                   <img className="h-5 w-5" src="https://icon-library.com/images/free-trophy-icon/free-trophy-icon-24.jpg" alt="profile-picture" />
                   </span>
-                </Tooltip>
+                </Tooltip>)}
+                {eventlist.includes('conference') && (
+                <Tooltip content="Conference">
+                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
+                  <img className="h-5 w-5" src="https://icon-library.com/images/meeting-icon-png/meeting-icon-png-25.jpg" alt="profile-picture" />
+                  </span>
+                </Tooltip>)}
+                {eventlist.includes('specialEvents') && (
+                <Tooltip content="Special Events">
+                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
+                  <img className="h-5 w-5" src="https://icon-library.com/images/free-event-icon/free-event-icon-15.jpg" alt="profile-picture" />
+                  </span>
+                </Tooltip>)}
+                {eventlist.includes('party') && (
+                <Tooltip content="Partys">
+                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
+                  <img className="h-5 w-5" src="https://icon-library.com/images/party-icon/party-icon-19.jpg" alt="profile-picture" />
+                  </span>
+                </Tooltip>)}
               </div>
             </CardBody>
-            <CardFooter className="pt-1">
-              <Button size="lg" fullWidth={true}>
+            <CardFooter className="h-[6rem]">
+              <Button className='mb-0' size="lg" fullWidth={true}>
                 Book Your Slot
               </Button>
             </CardFooter>
-          </Card>
+          </Card>)})}
           </div>
         </div>
         </div>

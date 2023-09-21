@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { StickyNavbar } from '../Common/NavBar';
 import './About.css';
@@ -15,6 +15,8 @@ import { faHeart } from '@fortawesome/free-solid-svg-icons';
   import {
     CardHeader,
   } from "@material-tailwind/react";
+import { useNavigate, useParams } from 'react-router-dom';
+import { axiosUserInstance } from '../../../Constants/axios';
    
   // function CheckIcon() {
   //   return (
@@ -36,8 +38,8 @@ import { faHeart } from '@fortawesome/free-solid-svg-icons';
   // }
    
 function PricingCard() {
-    return (
-      <div  className='flex align-middle justify-center w-100 mt-10'>
+  return (
+    <div  className='flex align-middle justify-center w-100 mt-10'>
 
       <Card color="gray" variant="gradient" className="w-full max-w-[25rem] p-5 flex justify-center">
         <div className="flex flex-row gap-4 justify-center">
@@ -52,7 +54,7 @@ function PricingCard() {
               variant="small"
               color="white"
               className="font-normal uppercase"
-            >
+              >
               EVENTS
             </Typography>
             <Typography
@@ -79,7 +81,7 @@ function PricingCard() {
               variant="h1"
               color="white"
               className=" flex justify-center gap-1 text-7xl font-normal"
-            >4
+              >4
             </Typography>
           </CardHeader>
           <CardHeader
@@ -110,13 +112,15 @@ function PricingCard() {
   }
 
 function About() {
-  const user = useSelector((state) => state.user);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const toggleSidebar = () => {
-    console.log('Toggle sidebar clicked');
-    setSidebarOpen(!sidebarOpen);
-  };
+  const [data, setData] = useState([])
+  const {id} = useParams()
+  useEffect(()=>{
+    console.log(id);
+      axiosUserInstance.get(`/detailpage?id=${id}`).then((res)=>{setData(res.data.result), console.log(res.data.result)}).catch((error)=>console.log(error.message))
+  },[])
+  console.log(data);
+  const navigate=useNavigate()
 
   return (
     <div className='main'>
@@ -124,12 +128,12 @@ function About() {
         <StickyNavbar />
         <div>
           <div className='background-container'>
-            <h1 className='main_text'>FIESTA CATERS</h1>
+            <h1 className='main_text'>{data.team_name}</h1>
           </div>
         </div>
         <div className='main-content'>
         <div className='flex justify-between p-5'>
-        <Button>Book Slot</Button>
+        <Button onClick={()=>navigate(`/eventbooking/${id}`)}>Book Slot</Button>
         <IconButton color="red" className="rounded-full">
         <FontAwesomeIcon icon={faHeart} />
       </IconButton>

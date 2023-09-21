@@ -90,6 +90,45 @@ export const userLogin= (email, password)=>async(dispatch)=>{
           return error
     }
 }
+export const userVerify= (id)=>async(dispatch)=>{
+    try {
+      console.log();
+        dispatch({
+            type: USER_LOGIN_REQUEST,
+          });
+    
+          const config = {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            params: {
+              id
+            }
+          };
+    
+          const { data } = await axiosUserInstance.get(
+            "/verifyemail",
+            config
+          );
+          console.log(data);
+          localStorage.setItem("userInfo", JSON.stringify(data));
+          
+          dispatch({
+            type: USER_LOGIN_SUCCESS,
+            payload: data,
+          });
+          return data
+    } catch (error) {
+        dispatch({
+            type: USER_LOGIN_FAIL,
+            payload:
+              error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message,
+          })
+          return error
+    }
+}
 export const userGoogleLogin= (value)=>async(dispatch)=>{
     try {
       console.log('heyy');
@@ -212,3 +251,30 @@ export const LogoutDetails = ()=> async (dispatch)=>{
     console.log(error.message);
   }
 }
+
+export const EventSubmit = async(eventdata)=>
+{
+  try {
+    const userData=localStorage.getItem('userInfo')
+    const userInfo=JSON.parse(userData)
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token.token}`,
+      },
+    };
+    console.log(userInfo.token.token);
+    const { data } = await axiosUserInstance.post(
+      "/eventbooking",
+      { eventdata,userInfo },
+      config
+    );
+    return data
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+
+// {"user":{"_id":"64f57c95b7cf0bdbf770373c","name":"Taj Muhammed","mob":9895299091,"email":"tajmuhammed0011@gmail.com","password":"$2b$10$dSEbzqbx8Ej6HcV26FTrtus1ua9laxeKdxINs9Dk3m11JRKWkQbSC","is_manager":false,"is_admin":false,"__v":0,"is_verified":true},
+// "token":{"userId":"64f57c95b7cf0bdbf770373c","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NGY1N2M5NWI3Y2YwYmRiZjc3MDM3M2MiLCJpYXQiOjE2OTUyMjE1ODksImV4cCI6MTY5NTI4MTU4OX0.oZyz3LAEGTgfEZUZvFRhHdkHOF33Mhqm6K7VNpR8eVo","createdAt":"2023-09-20T14:29:52.042Z","_id":"650b07551449bf35e3db2a11","__v":0},"alert":"Logined","status":true}

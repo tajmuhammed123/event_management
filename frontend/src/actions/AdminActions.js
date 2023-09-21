@@ -55,3 +55,41 @@ export const adminLogin= (email, password)=>async(dispatch)=>{
       console.log(error.message);
     }
   }
+  export const ManagerApprove = async(id)=>
+  {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      const { data } = await axiosAdminInstance.post(
+        "/managerapproval",
+        { id },
+        config
+      );
+      return data
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+  export const ManagerReject = async(id)=>
+  {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      const { data } = await axiosAdminInstance.post(
+        "/managerreject",
+        { id },
+        config
+      );
+      return data
+    } catch (error) {
+      console.log(error.message);
+    }
+  }

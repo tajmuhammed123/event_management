@@ -9,36 +9,28 @@ import {
     MANAGER_LOGOUT, 
     MANAGER_REGISTER_FAIL, 
     MANAGER_REGISTER_REQUEST, 
-    MANAGER_REGISTER_SUCCESS, 
     MANAGER_RESET_PASSWORD_FAIL, 
     MANAGER_RESET_PASSWORD_REQUEST, 
     MANAGER_RESET_PASSWORD_SUCCESS
     } from "../Constants/ManagerConstants";
 import { axiosManagerInstance } from "../Constants/axios";
 
-export const managerReg= (value,eventdata)=>async(dispatch)=>{
+export const managerReg= (name,email,mob, password)=>async(dispatch)=>{
     try {
         dispatch({
             type: MANAGER_REGISTER_REQUEST,
           });
-    
           const config = {
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json"
             },
           };
-    
+          console.log(name,email,mob, password);
           const { data } = await axiosManagerInstance.post(
             "/signup",
-            { value,eventdata },
+             {name,email,mob, password},
             config
           );
-          console.log(data.status);
-          localStorage.setItem("managerInfo", JSON.stringify(data));
-          dispatch({
-            type: MANAGER_REGISTER_SUCCESS,
-            payload: data,
-          });
           return data
     } catch (error) {
         dispatch({
@@ -100,6 +92,46 @@ export const LogoutDetails = ()=> async (dispatch)=>{
           })
           return error
     }
+}
+
+export const managerVerify= (id)=>async(dispatch)=>{
+  try {
+    console.log();
+      dispatch({
+          type: MANAGER_LOGIN_REQUEST,
+        });
+  
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          params: {
+            id
+          }
+        };
+  
+        const { data } = await axiosManagerInstance.get(
+          "/managerverify",
+          config
+        );
+        console.log(data);
+        localStorage.setItem("managerInfo", JSON.stringify(data));
+        
+        dispatch({
+          type: MANAGER_LOGIN_SUCCESS,
+          payload: data,
+        });
+        return data
+  } catch (error) {
+      dispatch({
+          type: MANAGER_LOGIN_FAIL,
+          payload:
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message,
+        })
+        return error
+  }
 }
 
 export const forgotPassword = (email) => async (dispatch) => {
@@ -171,7 +203,7 @@ export const forgotPasswordVerify =
     }
   };
 
-export const managerDetailReg = (name,salutation,about,events,location,dishes)=>async(dispatch)=>{
+export const managerDetail = (eventdata,formData)=>async(dispatch)=>{
     try {
 
       const tokenId = JSON.parse(localStorage.getItem("managerInfo"))
@@ -179,17 +211,19 @@ export const managerDetailReg = (name,salutation,about,events,location,dishes)=>
             type: MANAGER_EVENT_DATA_REQUEST,
             Authorization: `Bearer ${tokenId.token}`
         })
-
+        const managerData=localStorage.getItem('managerInfo')
+        const managerInfo=JSON.parse(managerData)
         const config={
           headers: {
-            "Content-Type":"application/json"
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${managerInfo.token.token}`,
           }
         }
-        console.log({name,salutation,about,events,location,dishes});
+        console.log(formData.get(`profileImage`))
         console.log(tokenId.user._id);
         const {data} =await axiosManagerInstance.post(
          `/eventdata/${tokenId.user._id}`,
-          {name,salutation,about,events,location,dishes},
+          {formData,eventdata},
           config
         )
 

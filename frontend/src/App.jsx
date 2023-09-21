@@ -1,7 +1,7 @@
 import {BrowserRouter,Route,Routes} from "react-router-dom"
-import UserRouter from "./Routes/UserRouter";
-import AdminRoutes from "./Routes/AdminRoutes";
-import ManagerRoutes from "./Routes/ManagerRoutes";
+import UserRouter from "./Routes/User/UserRouter";
+import AdminRoutes from "./Routes/Admin/AdminRoutes";
+import ManagerRoutes from "./Routes/Manager/ManagerRoutes";
 
 function App() {
   return (
