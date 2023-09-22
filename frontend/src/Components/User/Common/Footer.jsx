@@ -23,7 +23,7 @@ export function Footer() {
       <div className="mx-auto w-full max-w-8xl px-7">
         <div className="grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
           <div>
-            <img src="/Logo/AX_WHITE.png" alt="" className='w-10,p-5' style={{width:'80px'}} />
+            <img src="/Logo/AX WHITE.png" alt="" className='w-10,p-5' style={{width:'80px'}} />
           </div>
           <div className="grid grid-cols-3 justify-between gap-4">
             {LINKS.map(({ title, items }) => (

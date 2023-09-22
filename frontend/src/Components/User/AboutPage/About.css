@@ -36,7 +36,7 @@
       font-weight: bold;
       color: white;
   }
-  /* Example styles for the sidebar and collapse button */
+  
   .main {
     display: flex;
     height: 100vh;
@@ -44,33 +44,6 @@
     padding: 0 !important;
     
   }
-  
-  .sidebar {
-    width: 250px;
-    background-color: #f0f0f0;
-    transition: width 0.3s ease;
-    z-index: 1000; 
-    height: 100vh;/* Use CSS transition for smooth animation */
-    overflow: hidden;
-    position: fixed;
-  }
-  
-  .sidebar.open {
-    width: 60px; /* Adjust width to make it collapse */
-  }
-  
-  .collapse-button {
-    cursor: pointer;
-    background-color: #ccc;
-    padding: 10px;
-    text-align: center;
-    transition: background-color 0.3s ease; /* Use transition for button background change */
-  }
-  
-  .collapse-button.open {
-    background-color: #aaa; /* Change background color when sidebar is open */
-  }
-  /* ... Existing styles ... */
   
   .content {
     /* Default styles for the content */
@@ -94,10 +67,14 @@
   }
   
   .custom-avatar {
-    min-height: 50px; /* Set your desired height */
-    min-width: 50px;  /* Set your desired width */
-    height: 50px !important; /* Set your desired height */
+    min-height: 50px;
+    min-width: 50px;
+    height: 50px !important;
     width: 50px !important; 
+  }
+
+  .images{
+    width: 75%;
   }
   
   

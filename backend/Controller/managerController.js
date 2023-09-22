@@ -147,7 +147,7 @@ const VerifyPassword=async(req,res)=>{
 const eventData=async(req,res)=>{
     try {
         console.log(req.body);
-        console.log(req.files);
+        console.log(req.files,'images');
         const multipleImages = req.files.filter(file => file.fieldname.startsWith('eventdata[profileImage]'))
         const Imagefilenames = multipleImages.map(file => file.filename)
         const cover_image = req.files.filter(file => file.fieldname === 'eventdata[cover_image]')
@@ -166,9 +166,15 @@ const eventData=async(req,res)=>{
                 dishes
 
             }
-            console.log(newEvent);
-            exists.eventData=newEvent
-            await exists.save()
+            if(exists.eventData){
+                await Manager.findOneAndUpdate({ _id: exists._id },
+                { $set: { eventData: newEvent } },
+                { new: true })
+            }else{
+                console.log(newEvent);
+                exists.eventData=newEvent
+                await exists.save()
+            }
         }
         return res.status(200).json({ alert:'Data added', status: true});
     } catch (error) {
