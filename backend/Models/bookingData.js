@@ -39,8 +39,11 @@ const bookingSchema=new mongoose.Schema({
     },
     additional_data:{
         type:String,
-        required:true
-    }
+    },
+    is_paid:{
+        type:String,
+        default:'not paid'
+    },
 })
 
 const bookingData=mongoose.model('bookingData',bookingSchema)

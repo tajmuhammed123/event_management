@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { StickyNavbar } from '../Common/NavBar';
 import {   
   Typography,
   Card,
@@ -58,9 +56,7 @@ function Events() {
   console.log(data);
 
   return (
-    <div className='main'>
-      <div className='content'>
-        <StickyNavbar className="sticky"  />
+    <>
         <div>
           <div className='background-container'>
             <h1 className='main_text'>BIRTHDAYS</h1>
@@ -305,8 +301,7 @@ function Events() {
       <div>
         <Footer/>
       </div>
-      </div>
-    </div>
+    </>
   );
 }
 

@@ -7,17 +7,44 @@ import Events from '../../Components/User/Events/Events'
 import UserPublic from './UserPublic'
 import EmailVerified from '../../Components/User/Common/EmailVerified'
 import EventBooking from '../../Components/User/Events/EventBooking'
+import UserProtect from './UserProtect'
+import LayOut from '../../Components/User/LayOut/LayOut'
+import Payment from '../../Components/User/Payment/Payment'
+import Success from '../../Components/User/Payment/Success'
+import { Cancel } from '@mui/icons-material'
+import { Profile } from '../../Components/User/Profile/Profile'
+import OrderHistory from '../../Components/User/OderHistory/OrderHistory'
 
 function UserRouter() {
+  let routeObj={
+    about:'/detailpage/:id',
+    eventlist:'/eventlist/:name',
+    signup:'/eventlist/:name',
+    verifyemail:'/verifyemail/:id',
+    eventbooking:'/eventbooking/:id',
+    payment:'/payment/:id/:bookid',
+    success:'/success',
+    cancel:'/cancel',
+    orderhistory:'/orderhistory',
+    profile:'/profile',
+    login:'/login',
+  }
   return (
     <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/detailpage/:id" element={<About />}></Route>
-        <Route path="/eventlist/:name" element={<Events />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/login" element={<UserPublic> <LogIn /></ UserPublic>}></Route>
-        <Route path='/verifyemail/:id' element={<EmailVerified />}></Route>
-        <Route path='/eventbooking/:id' element={<EventBooking />}></Route>
+      <Route path={routeObj.login} element={ <UserPublic><LogIn /></UserPublic> } />
+      <Route  path="/" element={ <LayOut/> }>
+        <Route index element={<Home />}></Route>
+        <Route path={routeObj.about} element={<About />}></Route>
+        <Route path={routeObj.eventlist} element={<Events />}></Route>
+        <Route path={routeObj.signup} element={<SignUp />}></Route>
+        <Route path={routeObj.verifyemail} element={<EmailVerified />}></Route>
+        <Route path={routeObj.eventbooking} element={<UserProtect><EventBooking /></UserProtect>} />
+        <Route path={routeObj.payment} element={<Payment />}></Route>
+        <Route path={routeObj.success} element={<Success />}></Route>
+        <Route path={routeObj.cancel} element={<Cancel />}></Route>
+        <Route path={routeObj.orderhistory} element={<OrderHistory />}></Route>
+        <Route path={routeObj.profile} element={<UserProtect><Profile /></UserProtect>}></Route>
+      </Route>
     </Routes>
   )
 }

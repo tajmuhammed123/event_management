@@ -150,11 +150,14 @@ const eventData=async(req,res)=>{
         console.log(req.files,'images');
         const multipleImages = req.files.filter(file => file.fieldname.startsWith('eventdata[profileImage]'))
         const Imagefilenames = multipleImages.map(file => file.filename)
+        console.log(Imagefilenames);
         const cover_image = req.files.filter(file => file.fieldname === 'eventdata[cover_image]')
         const {userID}=req.params
         const exists=await Manager.findById(userID)
         if(exists){
-            const {team_name,salutation,about,events,location,dishes}=req.body.eventdata
+            const {team_name,salutation,about,events,location,dishes,advance_amount}=req.body.eventdata
+            const amount=parseInt(advance_amount)
+            console.log(req.body.eventdata);
             const newEvent={
                 cover_image:cover_image[0].filename,
                 team_name,
@@ -163,7 +166,8 @@ const eventData=async(req,res)=>{
                 multipleImages:Imagefilenames,
                 events,
                 location,
-                dishes
+                dishes,
+                advance_amount:amount
 
             }
             if(exists.eventData){
@@ -204,7 +208,7 @@ const managerVerify=async(req,res)=>{
         if (!token) {
             token = await new Tokenmodel({
                 userId: manager,
-                token: jwt.sign({ userId: manager }, process.env.JwtSecretKey, { expiresIn: 60000 })
+                token: jwt.sign({ userId: manager }, process.env.JwtSecretKey, { expiresIn: '1d'})
             });
             await token.save();
         }
@@ -216,8 +220,9 @@ const managerVerify=async(req,res)=>{
 
 const bookingData=async(req,res)=>{
     try {
+        console.log('hjhg');
         const {id}=req.params
-        const data= await Booking.find({manager_id:id})
+        const data= await Booking.find({manager_id:id, is_paid:'paid'})
         console.log(data);
         return res.status(200).json({data:data,alert:'booking data'})
     } catch (error) {

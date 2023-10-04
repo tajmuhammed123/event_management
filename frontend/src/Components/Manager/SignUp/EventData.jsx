@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 import {
     Card,
@@ -28,6 +27,7 @@ function EventData() {
       multipleImages:[],
       location: '',
       dishes: '',
+      advance_amount: 0,
     });
   
     // const GenerateError = (err) => {
@@ -46,33 +46,64 @@ function EventData() {
         conference:false,
         specialEvents:false
     });
+    
+    const [img,setImg]=useState([])
+    useEffect(()=>{
+        setEvents({
+            wedding: false,
+            birthday: false,
+            party: false,
+            competition: false,
+            conference: false,
+            specialEvents: false,
+          });
+          setImg([])
+          console.log(events);
+          console.log(img);
+    },[])
   
     const handleEvents = async (eventName) => {
-  
-      setEvents({
-        ...events,
-        [eventName]: !events[eventName],
-    });
-    }
+        setEvents((prevEvents) => ({
+            ...prevEvents,
+            [eventName]: !prevEvents[eventName],
+        }));
+        console.log(events);
+        setEventData({ ...eventdata, events });
+    };
+    
 
     const formData = new FormData();
     const handleImages = async (e) => {
     
       try {
+        console.log('fdgf');
         const fileArray=[]
         const files = Array.from(e.target.files);
         files.forEach((file) => {
             fileArray.push(file)
         })
+        console.log(files);
+        console.log('hjg');
+        setImg(()=>fileArray)
+        console.log(fileArray);
+        console.log(img);
         setEventData({...eventdata,[e.target.name]:fileArray})
       } catch (error) {
         console.log(error.message);
       }
     }
 
+    const handleDeleteImage=(index) => {
+        const updatedImg = [...img];
+        updatedImg.splice(index, 1);
+        setImg(() => [ ...updatedImg])
+        console.log(img);
+        setEventData({...eventdata,profileImage:img})
+        console.log(eventdata);
+      };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-            setEventData({...eventdata,events})
             console.log(eventdata);
             const response= await dispatch(managerDetail(eventdata,formData))
             console.log(response);
@@ -80,7 +111,7 @@ function EventData() {
                 localStorage.setItem('managerToken',response.token)
                 navigate('/manager/home/');
             } else {
-              navigate('/manager/signup');
+              navigate('/manager/eventdata');
             }
       }
 
@@ -91,7 +122,7 @@ function EventData() {
             <div>  
         <Card color="transparent" className='m-0 grid place-items-center shadow-lg rounded-b-none py-8 px-4 text-center' floated={false} shadow={false} style={{border:'1px solid grey-50'}}>
         <Typography variant="h4" color="blue-gray">
-            Sign Up
+            Handle event
         </Typography>
         <Typography color="gray" className="mt-1 font-normal">
             Enter your details to register.
@@ -108,7 +139,15 @@ function EventData() {
                 <input name='cover_image' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.files[0]},console.log(e.target.files[0]))} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file"></input>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add Multiple images</label>
                 <input type="file" multiple name="profileImage" onChange={handleImages} />
-
+                {img.map((file, index) => (
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`Image ${index + 1}`}
+            key={index}
+            className='h-5 w-5'
+            onClick={() => handleDeleteImage(index)}
+          />
+        ))}
                 </div>
             <div className='flex flex-wrap w-full'>
             <Checkbox
@@ -199,10 +238,11 @@ function EventData() {
                 <div className='flex flex-row gap-2 justify-center'>
                     <Input size="lg" label="Available Dishes" name='dishes' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
                     <Input size="lg" label="Available Locations" name='location' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
+                    <Input size="lg" type='number' label="Advance Amount" name='advance_amount' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
                 </div>
             </div>
             <Button className="mt-6" fullWidth type='submit'>
-            Register
+            Add/ Update Data
             </Button>
         </form>
         </Card>

@@ -275,6 +275,62 @@ export const EventSubmit = async(eventdata)=>
   }
 }
 
+export const userPayment= async(id)=>{
+  try {
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+        const data  = await axiosUserInstance.post(
+          `/payment/${id}`,
+          config
+        );
+        console.log(data);
+        return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+export const paymentSuccess= async(id,mangId)=>{
+  try {
+    const userData=localStorage.getItem('userInfo')
+    const userInfo=JSON.parse(userData)
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userInfo.token.token}`,
+          },
+        };
+        const { data } = await axiosUserInstance.post(
+          `/paymentsuccess/${id}/${mangId}`,
+          config
+        );
+        return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+export const cancelOrder= async(id)=>{
+  try {
+    const userData=localStorage.getItem('userInfo')
+    const userInfo=JSON.parse(userData)
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userInfo.token.token}`,
+          },
+        };
+        const { data } = await axiosUserInstance.get(
+          `/cancelorder/${id}`,
+          config
+        );
+        return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
 
 // {"user":{"_id":"64f57c95b7cf0bdbf770373c","name":"Taj Muhammed","mob":9895299091,"email":"tajmuhammed0011@gmail.com","password":"$2b$10$dSEbzqbx8Ej6HcV26FTrtus1ua9laxeKdxINs9Dk3m11JRKWkQbSC","is_manager":false,"is_admin":false,"__v":0,"is_verified":true},
 // "token":{"userId":"64f57c95b7cf0bdbf770373c","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NGY1N2M5NWI3Y2YwYmRiZjc3MDM3M2MiLCJpYXQiOjE2OTUyMjE1ODksImV4cCI6MTY5NTI4MTU4OX0.oZyz3LAEGTgfEZUZvFRhHdkHOF33Mhqm6K7VNpR8eVo","createdAt":"2023-09-20T14:29:52.042Z","_id":"650b07551449bf35e3db2a11","__v":0},"alert":"Logined","status":true}

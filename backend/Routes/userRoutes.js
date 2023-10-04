@@ -13,6 +13,10 @@ userRouter.get('/homedata',userController.homeData)
 userRouter.get('/detailpage',userController.detailData)
 userRouter.get('/eventlist',userController.eventList)
 userRouter.get('/managerdata/:id',userController.managerData)
+userRouter.get('/orderdata/:id',userAuth,userController.orderHistory)
+userRouter.get('/cancelorder/:id',userAuth,userController.cancelOrder)
 userRouter.post('/eventbooking',userAuth,userController.submitBooking)
+userRouter.post('/payment/:id',userController.userPayment)
+userRouter.post('/paymentsuccess/:id/:mangId',userController.paymentSuccess)
 
 module.exports=userRouter

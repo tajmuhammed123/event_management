@@ -17,6 +17,7 @@ import { EventSubmit } from '../../../actions/UserActions';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import moment from 'moment'
+import Payment from '../Payment/Payment';
 
 function Icon() {
     return (
@@ -87,7 +88,9 @@ function EventBooking() {
             const response= await EventSubmit(eventdata)
             console.log(response);
             if (response.status) {
-                navigate('/');
+              let bookid=response.data._id
+
+              navigate(`/payment/${id}/${bookid}`);
             } else {
               navigate('/eventbooking');
             }
@@ -111,7 +114,7 @@ function EventBooking() {
   return (
     <div className=''>
 
-        <div className='flex justify-center items-center h-screen' >
+        <div className='flex justify-center items-center' >
             <div>  
         <Card color="transparent" className='m-0 grid place-items-center shadow-lg rounded-b-none py-8 px-4 text-center' floated={false} shadow={false} style={{border:'1px solid grey-50'}}>
         <Typography variant="h4" color="blue-gray">
@@ -123,13 +126,13 @@ function EventBooking() {
         <form className="mt-8 mb-2 w-400 max-w-screen-lg sm:w-200" onSubmit={handleSubmit} encType="multipart/form-data">
             <div className="mb-4 flex flex-col gap-6">
                 <div className='flex flex-row gap-2 justify-center'>
-                <Input size="lg" label="Name" name='name' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                <Input size="lg" label="Event Name" name='event_name' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
+                <Input size="lg" label="Name" name='name' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
+                <Input size="lg" label="Event Name" name='event_name' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
                 </div>
-                <Input size="lg" label="Mobile Number" name='mob' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
+                <Input size="lg" label="Mobile Number" name='mob' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
             <div className='flex flex-wrap w-full'>
-                <Input size="lg" label="Preffered Dishes" name='preffered_dishes' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                <Input size="lg" label="Address" name='address' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
+                <Input size="lg" label="Preffered Dishes" name='preffered_dishes' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
+                <Input size="lg" label="Address" name='address' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
             <div className="flex gap-10">
                 {eventArray.map((data,index)=>(<Radio
                     key={index}
@@ -162,13 +165,13 @@ function EventBooking() {
         name="date"
         value={moment(eventdata.date).format('YYYY-MM-DD')}
       />
-                    <Input size="lg" label="Time" name='time' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                </div>
+            <Input size="lg" label="Time" name='time' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
+          </div>
             <Textarea size="lg" label="Additional Details" name='additional_data' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-            </div>
-            <Button className="mt-6" fullWidth type='submit'>
-            Submit
-            </Button>
+          </div>
+          <Button className="mt-6" fullWidth type='submit'>
+            Make your Advance Payment
+          </Button>
         </form>
         </Card>
         <ToastContainer />

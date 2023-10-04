@@ -58,9 +58,12 @@ export const adminLogin= (email, password)=>async(dispatch)=>{
   export const ManagerApprove = async(id)=>
   {
     try {
+      const userData=localStorage.getItem('adminInfo')
+      const userInfo=JSON.parse(userData)
       const config = {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token.token}`,
         },
       };
 
@@ -77,9 +80,12 @@ export const adminLogin= (email, password)=>async(dispatch)=>{
   export const ManagerReject = async(id)=>
   {
     try {
+      const userData=localStorage.getItem('adminInfo')
+      const userInfo=JSON.parse(userData)
       const config = {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token.token}`,
         },
       };
 
@@ -90,6 +96,21 @@ export const adminLogin= (email, password)=>async(dispatch)=>{
       );
       return data
     } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  export const addEventCategorey = async(values)=>{
+    try{
+      console.log(values);
+      const config={
+        headers:{
+          "Content-Type": "multipart/form-data"
+        }
+      }
+      const {data}=await axiosAdminInstance.post('/addeventcategorey',values,config)
+      return data
+    }catch(error){
       console.log(error.message);
     }
   }

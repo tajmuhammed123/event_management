@@ -69,9 +69,7 @@ function About() {
   console.log(data);
 
   return (
-    <div className='main'>
-      <div className='content'>
-        <StickyNavbar />
+    <>
         <div>
           <div className='background-container'>
             <h1 className='main_text'>{data.team_name}</h1>
@@ -210,7 +208,7 @@ function About() {
                       )}
               </div>
           </div>
-      <div className="mx-auto max-w-screen-md py-12">
+      {/* <div className="mx-auto max-w-screen-md py-12">
           <Card className="mb-12 overflow-hidden">
             <img
               alt="nature"
@@ -236,13 +234,9 @@ function About() {
             to be a chunk of change. There are more projects lined up charge extra
             the next time.
           </Typography>
+        </div> */}
         </div>
-        </div>
-        <div>
-          <Footer/>
-        </div>
-      </div>
-    </div>
+      </>
   );
 }
 

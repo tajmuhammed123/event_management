@@ -42,6 +42,8 @@ function SignUp() {
         GenerateError('Your email cannot be null')
       } else if (!password) {
         GenerateError('Your password cannot be null')
+      }else if (password.length<5) {
+        GenerateError('Your password must be above 5')
       } else {
         const response = await dispatch(userReg(name, mob, email, password));
         console.log(response);

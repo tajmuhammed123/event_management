@@ -1,6 +1,6 @@
 const mongoose=require('mongoose')
 
-const evetDataSchema=new mongoose.Schema({
+const eventListModelSchema=new mongoose.Schema({
     event_name:{
         type:String,
         required:true
@@ -8,8 +8,12 @@ const evetDataSchema=new mongoose.Schema({
     event_image:{
         type:String,
         required:true
+    },
+    is_block:{
+        type:Boolean,
+        default:false
     }
 })
 
-const eventData=mongoose.model('eventData',evetDataSchema)
-module.exports=eventData
+const eventListModel=mongoose.model('eventListModel',eventListModelSchema)
+module.exports=eventListModel

@@ -53,6 +53,7 @@ function ProfileMenu() {
     {
       label: `${userInfo.user.name}`,
       icon: UserCircleIcon,
+      onclick: ()=>{navigate('/profile')}
     },
     {
       label: "Edit Profile",
@@ -212,7 +213,7 @@ export function StickyNavbar() {
             </svg>
           </IconButton>
         </div>
-          <Sidebar/>
+          <Sidebar closeSidebar={closeDrawer}/>
         </Drawer>
     <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none py-2 px-4 lg:pr-8 lg:pl-6 lg:py-4">
       <div className="flex items-center justify-between text-blue-gray-900">

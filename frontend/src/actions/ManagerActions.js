@@ -213,6 +213,7 @@ export const managerDetail = (eventdata,formData)=>async(dispatch)=>{
         })
         const managerData=localStorage.getItem('managerInfo')
         const managerInfo=JSON.parse(managerData)
+        console.log(managerInfo.token.token);
         const config={
           headers: {
             "Content-Type": "multipart/form-data",

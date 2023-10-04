@@ -1,9 +1,12 @@
 const User=require('../Models/userModels')
 const Manager=require('../Models/managerModel')
+const Payment=require('../Models/transactionModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
 const  Tokenmodel =require('../Models/token.js')
+const { MultiUploadCloudinary, uploadToCloudinary } = require('../utils/cloudinary')
+const eventListModel = require('../Models/eventsModel')
 
 const adminLogin = async (req, res) => {
     try {
@@ -25,7 +28,7 @@ const adminLogin = async (req, res) => {
                     console.log('hjkgh');
                     token = await new Tokenmodel({
                         userId: exists._id,
-                        token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: 60000 })
+                        token: jwt.sign({ userId: exists._id }, process.env.JwtSecretKey, { expiresIn: '1d' })
                     });
                     await token.save();
                 }
@@ -43,6 +46,33 @@ const adminLogin = async (req, res) => {
 const managerData=async(req,res)=>{
     try {
         const data=await Manager.find({eventData: { $exists: true, $ne: null }})
+        return res.status(200).json({data:data,status:true})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const userData=async(req,res)=>{
+    try {
+        const data=await Payment.find({})
+        return res.status(200).json({data:data,status:true})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const bookingData=async(req,res)=>{
+    try {
+        const data=await Payment.find({})
+        return res.status(200).json({data:data,status:true})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const userBlock=async(req,res)=>{
+    try {
+        const {id}=req.params
+        const user=await User.findById(id)
+        const data=await User.findByIdAndUpdate(id,{$set:{is_block:!user.is_block}},{new:true})
         return res.status(200).json({data:data,status:true})
     } catch (error) {
         console.log(error.message);
@@ -72,9 +102,31 @@ const managerReject=async(req,res)=>{
     }
 }
 
+const addEvent=async(req,res)=>{
+    try {
+        const {categorey}=req.body
+        console.log(req.file);
+        console.log(req.body);
+        const cloudinarydata = await uploadToCloudinary(req.file.path, "categorey");
+        console.log(cloudinarydata);
+        const data= new eventListModel({
+            event_name:categorey,
+            event_image:cloudinarydata.url
+        })
+        let rslt=await data.save()
+        console.log(rslt);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 module.exports={
     adminLogin,
     managerData,
+    userData,
+    bookingData,
+    userBlock,
     managerApprove,
-    managerReject
+    managerReject,
+    addEvent
 }

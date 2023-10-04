@@ -34,6 +34,10 @@ const evetDataSchema=new mongoose.Schema({
         type:String,
         required:true
     },
+    advance_amount:{
+        type:Number,
+        required:true
+    },
 })
 
 const managerSchema=new mongoose.Schema({
@@ -60,6 +64,10 @@ const managerSchema=new mongoose.Schema({
     is_authorized:{
         type:Boolean,
         default:false
+    },
+    wallet_amount:{
+        type:Number,
+        default:0
     },
     eventData:{type:evetDataSchema}
 })

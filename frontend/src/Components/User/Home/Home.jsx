@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { StickyNavbar } from '../Common/NavBar';
 import './Home.css';
 import {   
   Typography,
@@ -57,9 +56,7 @@ function Home() {
   const navigate=useNavigate()
 
   return (
-    <div className='main'>
-      <div className='content'>
-        <StickyNavbar className="sticky"  />
+    <>
         <div>
           <div className='background-container'>
             <h1 className='main_text'>HOME</h1>
@@ -396,10 +393,8 @@ function Home() {
         </div>
         </div>
       <div>
-        <Footer/>
       </div>
-      </div>
-    </div>
+      </>
   );
 }
 

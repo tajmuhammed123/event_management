@@ -28,7 +28,12 @@ const evetDataSchema=new mongoose.Schema({
     dishes:{
         type:String,
         required:true
+    },
+    advance_amount:{
+        type:Number,
+        required:true
     }
+
 })
 
 const eventData=mongoose.model('eventData',evetDataSchema)

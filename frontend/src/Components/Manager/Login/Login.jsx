@@ -14,6 +14,7 @@ import {
   Typography,
   CardHeader,
   CardBody,
+  Spinner,
 } from "@material-tailwind/react";
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -39,6 +40,7 @@ function LogIn() {
     const [reset, setReset] = useState(false);
     const [otpSent, setSentOtp] = useState(false);
     const [otp, setOtp] = useState("");
+    const [loading, setLoading] = useState(false)
 
     const handleOtp= async(e)=>{
       e.preventDefault();
@@ -50,29 +52,33 @@ function LogIn() {
         setSentOtp(false)
       }
     }
-    const handleSubmit = async(e)=>{
-        e.preventDefault()
-        try{
-            const {email,password}=value
-            if(!email){
-              GenerateError('Email cannot be null')
-            }else if(!password){
-              GenerateError('Password cannot be null')
-            }else{
-                const response= await dispatch(managerLogin(email,password))
-                console.log(response);
-                if(response.response){
-                  toast(response.response.data.alert)
-                }
-                if(response.status){
-                    localStorage.setItem('managertoken',response.token)
-                    navigate('/manager/home')
-                }
-            }
-        }catch(err){
-            console.log(err.message)
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const { email, password } = value;
+        if (!email) {
+          GenerateError('Email cannot be null');
+        } else if (!password) {
+          GenerateError('Password cannot be null');
+        } else {
+          setLoading(true); // Show the spinner
+          console.log(loading);
+          const response = await dispatch(managerLogin(email, password));
+          setLoading(false); // Hide the spinner when the response is received
+          console.log(loading);
+          console.log(response);
+          if (response.response) {
+            toast(response.response.data.alert);
+          }
+          if (response.status) {
+            localStorage.setItem('managertoken', response.token);
+            navigate('/manager/');
+          }
         }
-    }
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
 
     const handleForgot = async(e) => {
       const {email,password}=value
@@ -144,8 +150,8 @@ function LogIn() {
             </div>
             <div>
             </div>
-            <Button className="mt-6" fullWidth type='submit'>
-              Login
+            <Button className="mt-6" fullWidth type='submit'  disabled={loading}>
+              {loading ? <Spinner /> : 'Login'}
             </Button>
             <Typography color="gray" className="mt-4 text-center font-normal">
               <a href="#" className="font-medium text-gray-900" onClick={()=>setReset(true)}>

@@ -6,13 +6,14 @@ import {
   ListItemSuffix,
   Chip,
 } from "@material-tailwind/react";
+import { useNavigate } from "react-router-dom";
  
-export function SidebarList() {
-
+export function SidebarList({closeSidebar}) {
+  const navigate=useNavigate()
 
   return (
         <List>
-          <ListItem>
+          <ListItem onClick={()=>(navigate('/'),closeSidebar())}>
             <ListItemPrefix>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +30,7 @@ export function SidebarList() {
             </ListItemPrefix>
             Dashboard
           </ListItem>
-          <ListItem>
+          <ListItem onClick={()=>(navigate('/orderhistory/'),closeSidebar())}>
             <ListItemPrefix>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +45,7 @@ export function SidebarList() {
                 />
               </svg>
             </ListItemPrefix>
-            E-Commerce
+            Order History
           </ListItem>
           <ListItem>
             <ListItemPrefix>

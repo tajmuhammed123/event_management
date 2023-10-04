@@ -4,7 +4,7 @@ function UserProtect(props) {
   if(localStorage.getItem('userInfo')){
     return props.children;
   }else{
-    return <Navigate to='/loin'/>
+    return <Navigate to='/login'/>
   }
 }
 

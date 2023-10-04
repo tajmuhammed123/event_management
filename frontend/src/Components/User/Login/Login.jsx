@@ -14,6 +14,7 @@ import {
   Typography,
   CardHeader,
   CardBody,
+  Spinner,
 } from "@material-tailwind/react";
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -40,6 +41,7 @@ function LogIn() {
     const [otpSent, setSentOtp] = useState(false);
     const [otp, setOtp] = useState("");
     const [user, setUser] = useState([]);
+    const [loading, setLoading] = useState(false)
 
     const handleOtp= async(e)=>{
       e.preventDefault();
@@ -60,7 +62,10 @@ function LogIn() {
             }else if(!password){
               GenerateError('Password cannot be null')
             }else{
-                const response= await dispatch(userLogin(email,password))
+              setLoading(true); // Show the spinner
+              console.log(loading);
+              const response= await dispatch(userLogin(email,password))
+              setLoading(false); // Hide the spinner when the response is received
                 console.log(response);
                 if(response.response){
                   toast(response.response.data.alert)
@@ -213,8 +218,8 @@ function LogIn() {
               }
               containerProps={{ className: '-ml-2.5' }}
             /> */}
-            <Button className="mt-6" fullWidth type='submit'>
-              Login
+            <Button className="mt-6" fullWidth type='submit' disabled={loading}>
+            {loading ? <Spinner className='flex justify-center' /> : 'Login'}
             </Button>
             <Typography color="gray" className="mt-4 text-center font-normal">
               <a href="#" className="font-medium text-gray-900" onClick={()=>setReset(true)}>

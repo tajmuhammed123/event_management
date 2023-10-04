@@ -11,6 +11,7 @@ import {
   Typography,
   CardHeader,
   CardBody,
+  Spinner,
 } from "@material-tailwind/react";
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -29,6 +30,7 @@ function AdminLogIn() {
         autoClose: 3000
       });
     };
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async(e)=>{
         e.preventDefault()
@@ -39,7 +41,10 @@ function AdminLogIn() {
             }else if(!password){
               GenerateError('Password cannot be null')
             }else{
+                setLoading(true); // Show the spinner
+                console.log(loading);
                 const response= await dispatch(adminLogin(email,password))
+                setLoading(false); 
                 console.log(response);
                 if(response.response){
                   toast(response.response.data.alert)
@@ -83,8 +88,8 @@ function AdminLogIn() {
               <Input size="lg" name='email' value={value.email} onChange={(e)=>setValue({...value,[e.target.name]:e.target.value})} label="Email" />
               <Input type="password" name='password' value={value.password} onChange={(e)=>setValue({...value,[e.target.name]:e.target.value})} size="lg" label="Password" />
             </div>
-            <Button className="mt-6" fullWidth type='submit'>
-              LogIn
+            <Button className="mt-6" fullWidth type='submit' disabled={loading}>
+            {loading ? <Spinner /> : 'Login'}
             </Button>
           </form>
         </CardBody>

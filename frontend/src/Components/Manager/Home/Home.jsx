@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StickyNavbar } from '../Common/NavBar';
 import './Home.css';
 import { useSelector } from 'react-redux';
-import { Avatar, Button, Card, List, ListItem, ListItemPrefix, Typography } from '@material-tailwind/react';
+import { Button, Card, CardHeader, Typography } from '@material-tailwind/react';
 import { useNavigate } from 'react-router-dom';
-import { axiosManagerInstance } from '../../../Constants/axios';
+import { ImageList, ImageListItem } from '@mui/material';
+import { CelebrationOutlined, EmojiEventsOutlined, FavoriteBorderOutlined, FestivalOutlined, GroupsOutlined } from '@mui/icons-material';
+import { CakeIcon } from '@heroicons/react/24/outline';
 
 function Home() {
 
@@ -22,30 +24,24 @@ function Home() {
   //   },
   // });
   const {manager}=useSelector(state=>state.managerInfo)
-  const [data,setData]=useState([])
-  const bookings=async()=>{
-    try {
-      const response =await axiosManagerInstance.get(`/bookingdata/${manager.user._id}`).then((res)=>{setData(res.data.data),console.log(res.data.data)})
-      console.log(response.data);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+  const [eventlist, setEventlist] = useState([]);
+  console.log(manager);
+  
+  const userdata=manager.user.eventData
+  console.log(userdata);
   useEffect(()=>{
-    bookings()
     console.log(manager);
+    const eventlist = Object.keys(userdata.events)
+    .filter((key) => userdata.events[key] === 'true');
+    setEventlist(eventlist)
   },[])
-  console.log(data);
   const coverImage= manager.user.eventData
-  ? `/public/Images/${manager.user.eventData.cover_image}`
+  ? `/Images/${manager.user.eventData.cover_image}`
   : 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
   const navigate=useNavigate()
 
   return (
-    <div className='main'>
-      <div className='content'>
-        <StickyNavbar className="sticky"  /> 
         <div>
           <div className='background-container flex justify-center align-middle' style={{ backgroundImage: `url(${coverImage})` }}>
             <h3>Welcome</h3>
@@ -54,29 +50,133 @@ function Home() {
           <div className='m-5'>
             <Button onClick={()=>navigate('/manager/eventdata')}>Add Event Datas</Button>
           </div>
-          <Card className="w-96 m-5">
-            <List>
-              {data.map((item, index) => (
-                <ListItem key={index}>
-                  <ListItemPrefix>
-                    <Avatar variant="circular" alt="candice" src="https://www.freeiconspng.com/uploads/msn-people-person-profile-user-icon--icon-search-engine-16.png" />
-                  </ListItemPrefix>
-                  <div>
-                    <Typography variant="h6" color="blue-gray">
-                      {item.event_name}
-                    </Typography>
-                    <Typography variant="small" color="gray" className="font-normal">
-                    {item.mob}
-                    </Typography>
-                  </div>
-                </ListItem>
-              ))}
-            </List>
-
-    </Card>
+    <div  className='flex align-middle justify-center w-100 mt-10'>
+          <Card color="gray" variant="gradient" className="w-full max-w-[25rem] p-5 flex justify-center">
+            <div className="flex flex-row gap-4 justify-center">
+              <div className="flex flex-row gap-4">
+              <CardHeader
+                floated={false}
+                shadow={false}
+                color="transparent"
+                className="m-0 rounded-none border-white/10 text-center p-3"
+                >
+                <Typography
+                  variant="small"
+                  color="white"
+                  className="font-normal uppercase"
+                  >
+                  EVENTS
+                </Typography>
+                <Typography
+                  variant="h1"
+                  color="white"
+                  className=" flex justify-center gap-1 text-7xl font-normal"
+                  >{eventlist.length}
+                </Typography>
+              </CardHeader>
+              <CardHeader
+                floated={false}
+                shadow={false}
+                color="transparent"
+                className="m-0 rounded-none border-white/10 text-center p-3" 
+              >
+                <Typography
+                  variant="small"
+                  color="white"
+                  className="font-normal uppercase"
+                  >
+                  REVIEWS
+                </Typography>
+                <Typography
+                  variant="h1"
+                  color="white"
+                  className=" flex justify-center gap-1 text-7xl font-normal"
+                  >4
+                </Typography>
+              </CardHeader>
+              <CardHeader
+                floated={false}
+                shadow={false}
+                color="transparent"
+                className="m-0 rounded-none border-white/10 text-center p-3"
+                >
+                <Typography
+                  variant="small"
+                  color="white"
+                  className="font-normal uppercase"
+                  >
+                  LIKES
+                </Typography>
+                <Typography
+                  variant="h1"
+                  color="white"
+                  className=" flex justify-center gap-1 text-7xl font-normal"
+                  >29
+                </Typography>
+              </CardHeader>
+              </div>
+            </div>
+          </Card>
+          </div>
+        <div className='flex flex-col pt-7 w-full mm'>
+          <h1 className='flex justify-center text-2xl font-bold mb-4'>Available Events</h1>
+          <div className="flex gap-2 justify-center w-full">
+              
+      {eventlist.includes('birthday') && (<Button variant="gradient" className="flex items-center gap-3 py-2 px-3">
+        <CakeIcon/>
+        Birthdays
+      </Button>)}
+      {eventlist.includes('wedding') && (<Button variant="gradient" className="flex items-center gap-3 py-2 px-3">
+        <FavoriteBorderOutlined/>
+        Weddings
+      </Button>)}
+      {eventlist.includes('party') && (<Button variant="gradient" className="flex items-center gap-3 py-2 px-3">
+        <CelebrationOutlined/>
+        Partys
+      </Button>)}
+      {eventlist.includes('competition') && (<Button variant="gradient" className="flex items-center gap-3 py-2 px-3">
+        <EmojiEventsOutlined/>
+        Competition
+      </Button>)}
+      {eventlist.includes('conference') && (<Button variant="gradient" className="flex items-center gap-3 py-2 px-3">
+        <GroupsOutlined/>
+        Conference
+      </Button>)}
+      {eventlist.includes('specialEvents') && (<Button variant="gradient" className="flex items-center gap-3 py-2 px-3">
+        <FestivalOutlined/>
+        Special event
+      </Button>)}
+          </div>
         </div>
-      </div>
-    </div>
+          <div className='flex items-center align-middle m-8 flex-col'>
+            <div className='pb-4'>
+            <Typography variant="h2">Images</Typography>
+            </div>
+              <ImageList className='images' variant="masonry" cols={3} gap={8}>
+              {userdata.multipleImages ? (userdata.multipleImages.map((img,index) => (
+                <ImageListItem key={index}>
+                  <img className='rounded-md'
+                    srcSet={`/Images/${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                    src={`/Images/${img}?w=248&fit=crop&auto=format`}
+                    alt={img}
+                  />
+                </ImageListItem>
+              ))):(<p>No image</p>)}
+            </ImageList>
+          </div>
+          <div className='flex items-center align-middle m-8 flex-col'>
+            <div className='pb-4'>
+            <Typography variant="h2">About</Typography>
+            </div>
+            <div className="image-collage">
+              {userdata.about ? (
+                <div className="font-semibold">{userdata.about}</div>
+                    ) : (
+                      <p>About is not provided</p>
+                      )}
+              </div>
+          </div>
+        </div>
   );
 }
 

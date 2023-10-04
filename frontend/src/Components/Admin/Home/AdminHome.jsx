@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AdminNavbar } from '../Common/NavBar'
-import { PencilIcon } from "@heroicons/react/24/solid";
 import {
   ArrowDownTrayIcon,
-  CheckIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import {
@@ -14,26 +12,26 @@ import {
   CardBody,
   Chip,
   CardFooter,
-  Avatar,
   IconButton,
   Tooltip,
   Input,
+  Spinner,
 } from "@material-tailwind/react";
 import { axiosAdminInstance } from '../../../Constants/axios';
 import { ManagerApprove, ManagerReject } from '../../../actions/AdminActions';
+import EventCategory from '../Categories/EventCategory';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
  
 const TABLE_HEAD = ["Name", "Salutation", "Location", "Status", "Account", ""];
 function AdminHome() {
 
-  const [data,setData]=useState([])
-  const TABLE_ROWS = data.map((item, index) => (  {
+  const [managerData,setData]=useState([])
+  const [bookData,setBookData]=useState([])
+  const [searchInput,setSearchInput]=useState('')
+  const TABLE_ROWS = managerData.map((item, index) => (  {
     name: item.name,
     amount: item.eventData.salutation,
-    date: "Wed 3:00pm",
     status: item.is_authorized,
-    account: "visa",
-    accountNumber: "1234",
-    expiry: "06/2026",
   }));
     // {
     //   name: "netflix",
@@ -46,25 +44,19 @@ function AdminHome() {
     // },
 
 
-  const ManagerData=async()=>{
-    try {
-      await axiosAdminInstance.get('/getmanagerdata').then((res)=>{setData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-  const [items,setItems]=useState('pending')
+  // const ManagerData=async()=>{
+  //   try {
+      // await axiosAdminInstance.get('/getmanagerdata').then((res)=>{setData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
+      // await axiosAdminInstance.get('/getuserdata').then((res)=>{setUserData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // }
   const handleApprove=async(id)=>{
     try {
       const response = ManagerApprove(id)
+      queryClient.invalidateQueries('manager')
       console.log(response.status);
-      if(response.status){
-        setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, is_authorized: 'updated' } : item
-        )
-      )
-      }
     } catch (error) {
       console.log(error.message);
     }
@@ -72,28 +64,178 @@ function AdminHome() {
   const handleReject=async(id)=>{
     try {
       const response = ManagerReject(id)
-      if(response.status){
-        setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, is_authorized: 'updated' } : item
-        )
-      )
-      }
+      queryClient.invalidateQueries('manager')
+      console.log(response);
       console.log(response.status);
     } catch (error) {
       console.log(error.message);
     }
   }
-  
-  useEffect(()=>{
-    ManagerData()
-    
-  },[])
+
+  const TABLE_HEAD = ["Manager ID", "User ID", "Employed", ""];
+
+
+  const queryClient=useQueryClient()
+  // const {isLoading,error,data}=useQuery({
+  //   queryKey:['user'],
+  //   queryFn:()=>axiosAdminInstance.get('/getuserdata').then((res)=>{setUserData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
+  // })
+  // useEffect(()=>{
+  //   ManagerData()
+  // },[isLoading])
+  const { isLoading:isLoading2, error:error2 } = useQuery({
+    queryKey: ['manager'],
+    queryFn: async () => {
+      try {
+        const userData=localStorage.getItem('adminInfo')
+  const userInfo=JSON.parse(userData)
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userInfo.token.token}`,
+    },
+  };
+        const response = await axiosAdminInstance.get('/getmanagerdata',config).then((res)=>{setData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
+        setData(response.data.data);
+        console.log(response.data.data);
+      } catch (err) {
+        console.error(err.message);
+      }
+    },
+  });
+  const { isLoading:isLoading1, error:error1 } = useQuery({
+    queryKey: ['booking'],
+    queryFn: async () => {
+      try {
+        const userData=localStorage.getItem('adminInfo')
+  const userInfo=JSON.parse(userData)
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userInfo.token.token}`,
+    },
+  };
+        const response = await axiosAdminInstance.get('/getbookingdata',config).then((res)=>{setBookData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
+        setBookData(response.data.data);
+        console.log(bookData);
+      } catch (err) {
+        console.error(err.message);
+      }
+    },
+  });
+
+  if(isLoading2 || isLoading1){
+      return <div className='h-screen w-screen flex items-center justify-center'>
+        <Spinner /></div>;
+  }
+
+  const managerdatas = managerData.filter(user => {
+    const searchInputLower = searchInput.toLowerCase();
+    const nameMatch = user.name.toLowerCase().includes(searchInputLower);
+    return nameMatch ;
+  })
+  console.log(bookData);
+
+
   return (
-    <div className='main'>
-    <div className='content'>
-      <AdminNavbar className="sticky"  /> 
-      <div className='m-5 flex justify-center'>
+    <>
+      <div className='flex justify-end mr-5 my-5'>
+      <EventCategory/>
+      </div>
+      <div className='flex justify-center flex-col'>
+        <div className='flex justify-center'>
+        <Typography variant='h2'>TRANSACTIONS</Typography>
+        </div>
+        <div className='flex justify-center'>
+        
+      <Card className="h-full w-1/2 overflow-y-scroll">
+      <table className="w-full min-w-max table-auto text-left">
+        <thead>
+          <tr>
+            {TABLE_HEAD.map((head) => (
+              <th
+                key={head}
+                className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
+              >
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  {head}
+                </Typography>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {bookData.map((item, index) => {
+            const isLast = index === bookData.length - 1;
+            const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
+ 
+            return (
+              <tr key={item._id}>
+                <td className={classes}>
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal"
+                  >
+                    {item.userId}
+                  </Typography>
+                </td>
+                <td className={classes}>
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal"
+                  >
+                    {item.managerId}
+                  </Typography>
+                </td>
+                <td className={classes}>
+                        <Chip
+                        className='w-max'
+                          size="sm"
+                          variant="ghost"
+                          value={item.amount}
+                          color={
+                            item.status === "paid"
+                              ? "green"
+                              : item.amount === "not paid"
+                              ? "amber"
+                              : "red"
+                          }
+                        />
+                </td>
+                <td className={classes}>
+                  <Typography
+                    as="a"
+                    href="#"
+                    variant="small"
+                    color="blue-gray"
+                    className="font-medium"
+                  >
+                    {item.status === "paid"
+                              ? "Paid"
+                              : item.amount === "not paid"
+                              ? "Not Paid"
+                              : "Cancelled"}
+                  </Typography>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </Card>
+    </div>
+      </div>
+      <div className='m-5 flex justify-center flex-col'>
+        <div className='flex justify-center'>
+        <Typography variant='h2'>MANAGER APPROVALS</Typography>
+        </div>
+        <div className='flex justify-center'>
       <Card className="h-full w-2/3">
       <CardHeader floated={false} shadow={false} className="rounded-none">
         <div className="mb-4 flex flex-col justify-between gap-8 md:flex-row md:items-center">
@@ -102,13 +244,14 @@ function AdminHome() {
               Manager Approvals
             </Typography>
             <Typography color="gray" className="mt-1 font-normal">
-              These are details about the last transactions
+              These are manager requests to approve
             </Typography>
           </div>
           <div className="flex w-full shrink-0 gap-2 md:w-max">
             <div className="w-full md:w-72">
               <Input
                 label="Search"
+                onChange={(e)=>(setSearchInput(e.target.value))}
                 icon={<MagnifyingGlassIcon className="h-5 w-5" />}
               />
             </div>
@@ -139,7 +282,7 @@ function AdminHome() {
             </tr>
           </thead>
           <tbody>
-            {data.map(
+            {managerdatas.map(
               (
                 item,
                 index,
@@ -276,9 +419,10 @@ function AdminHome() {
         </Button>
       </CardFooter>
     </Card>
-      </div>
     </div>
-  </div>
+      </div>
+
+  </>
   )
 }
 
