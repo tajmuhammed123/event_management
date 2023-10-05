@@ -6,6 +6,7 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { useSelector } from "react-redux";
+import EventCategory from "../Categories/eventCategory";
  
 export function Profile() {
   const {manager}=useSelector(state=>state.adminInfo)
@@ -48,6 +49,7 @@ export function Profile() {
         <Typography color="blue-gray">{manager.user.email}</Typography>
       </div>
       </CardHeader>
+      <EventCategory/>
       {/* <CardBody>
         <Typography variant="h4" color="blue-gray">
           UI/UX Review Check

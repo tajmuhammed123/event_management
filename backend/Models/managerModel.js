@@ -23,7 +23,7 @@ const evetDataSchema=new mongoose.Schema({
         required:true
     },
     events:{
-        type:Object,
+        type:Array,
         required:true
     },
     location:{

@@ -21,6 +21,7 @@ import { axiosAdminInstance } from '../../../Constants/axios';
 import { ManagerApprove, ManagerReject } from '../../../actions/AdminActions';
 import EventCategory from '../Categories/EventCategory';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
  
 const TABLE_HEAD = ["Name", "Salutation", "Location", "Status", "Account", ""];
 function AdminHome() {
@@ -33,6 +34,7 @@ function AdminHome() {
     amount: item.eventData.salutation,
     status: item.is_authorized,
   }));
+  const navigate=useNavigate()
     // {
     //   name: "netflix",
     //   amount: "$14,000",
@@ -135,12 +137,12 @@ function AdminHome() {
     return nameMatch ;
   })
   console.log(bookData);
-
+  
 
   return (
     <>
       <div className='flex justify-end mr-5 my-5'>
-      <EventCategory/>
+      <Button onClick={()=>navigate('/admin/addeventcategorey')}>Add Event Category</Button>
       </div>
       <div className='flex justify-center flex-col'>
         <div className='flex justify-center'>

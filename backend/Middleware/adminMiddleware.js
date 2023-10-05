@@ -14,6 +14,9 @@ const adminAuth = async (req, res, next) => {
             console.log(user);
             if (user) {
                 next();
+            }else{
+                console.log('not a user');
+                return res.status(403).json({message:'Not a user'})
             }
         }
     } catch (error) {

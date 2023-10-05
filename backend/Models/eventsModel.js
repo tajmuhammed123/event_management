@@ -12,6 +12,9 @@ const eventListModelSchema=new mongoose.Schema({
     is_block:{
         type:Boolean,
         default:false
+    },
+    description:{
+        type:String
     }
 })
 

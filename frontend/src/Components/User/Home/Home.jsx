@@ -10,9 +10,9 @@ import {
   Tooltip,
 } from "@material-tailwind/react"
 
-import { Footer } from '../Common/Footer';
 import { useNavigate } from 'react-router-dom';
 import { axiosUserInstance } from '../../../Constants/axios';
+import { useQuery } from '@tanstack/react-query';
    
   // function CheckIcon() {
   //   return (
@@ -48,6 +48,20 @@ function Home() {
       console.log(error);
     }
   }
+  const [events,setEventdata]=useState([])
+  const { isLoading, error, } = useQuery({
+    queryKey: ['eventdata'],
+    queryFn: async () => {
+      try {
+        const response = await axiosUserInstance.get('/geteventdata').then((res)=>setEventdata(res.data.eventData))
+        console.log(response);
+        console.log(response.data.eventData);
+      } catch (err) {
+        console.error(err.message);
+        // Handle error here
+      }
+    },
+  });
   useEffect(() => {
     homedata()
     console.log('Component is mounted');
@@ -193,9 +207,8 @@ function Home() {
             </CardFooter>
           </Card>
            {data.map((card,index)=>{
-            const coverImage=`/Images/${card.eventData.cover_image}`
-            const eventlist=Object.keys(card.eventData.events)
-            .filter((key) => card.eventData.events[key] === 'true' )
+            const coverImage=card.eventData.cover_image
+            const eventlist=card.eventData.events
           return(
           <Card className="w-full mt-6 max-w-[17rem] h-[30rem] shadow-lg mx-5" key={index} onClick={()=>navigate(`/detailpage/${card._id}`)}>
             <CardHeader className='h-[10rem]' floated={false} color="white">
@@ -239,42 +252,12 @@ function Home() {
 
               </Typography>
               <div className="group mt-5 inline-flex flex-wrap items-center gap-3">
-              {eventlist.includes('birthday') && (
-                <Tooltip content="Birthdays">
+              {events.map((item,index)=>(eventlist.includes(item.event_name) && (<Tooltip content="Birthdays" key={index}>
                   <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/cake-icon-png/cake-icon-png-24.jpg" alt="profile-picture" />
+                  <img className="h-5 w-5" src={item.event_image} alt="profile-picture" />
                   </span>
-                </Tooltip>)}
-                {eventlist.includes('wedding') && (
-                <Tooltip content="Weddings">
-                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/wedding-ceremony-icon/wedding-ceremony-icon-4.jpg" alt="profile-picture" />
-                  </span>
-                </Tooltip>)}
-                {eventlist.includes('competition') && (
-                <Tooltip content="Competition">
-                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/free-trophy-icon/free-trophy-icon-24.jpg" alt="profile-picture" />
-                  </span>
-                </Tooltip>)}
-                {eventlist.includes('conference') && (
-                <Tooltip content="Conference">
-                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/meeting-icon-png/meeting-icon-png-25.jpg" alt="profile-picture" />
-                  </span>
-                </Tooltip>)}
-                {eventlist.includes('specialEvents') && (
-                <Tooltip content="Special Events">
-                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/free-event-icon/free-event-icon-15.jpg" alt="profile-picture" />
-                  </span>
-                </Tooltip>)}
-                {eventlist.includes('party') && (
-                <Tooltip content="Partys">
-                  <span className="cursor-pointer rounded-full border border-gray-900/5 bg-gray-900/5 p-3 text-gray-900 transition-colors hover:border-gray-900/10 hover:bg-gray-900/10 hover:!opacity-100 group-hover:opacity-70">
-                  <img className="h-5 w-5" src="https://icon-library.com/images/party-icon/party-icon-19.jpg" alt="profile-picture" />
-                  </span>
-                </Tooltip>)}
+                </Tooltip>)))}
+                
               </div>
             </CardBody>
             <CardFooter className="h-[6rem]">
@@ -288,62 +271,20 @@ function Home() {
         <div className='flex flex-col pt-7 w-full mm bg-gray-100'>
           <h1 className='flex justify-center text-2xl font-bold mb-4'>AVAILABLE SERVICES</h1>
           <div className="flex flex-wrap gap-2 justify-center w-full px-10">
-            <Card className="w-48 m-7 cursor-pointer" onClick={()=>navigate('/eventlist/birthday')}>
+            {events.map((item,index)=>(<Card className="w-48 m-7 cursor-pointer" onClick={()=>navigate('/eventlist/birthday')} key={index}>
               <CardHeader floated={false} className="h-40">
-                <img src="https://icon-library.com/images/cake-icon-png/cake-icon-png-24.jpg" className='p-4' alt="profile-picture" />
+                <img className='p-2' src={item.event_image} />
               </CardHeader>
               <CardBody className="text-center">
                 <Typography variant="h6" color="blue-gray" className="mb-2" >
-                  Birthdays
+                  {item.event_name}
                 </Typography>
                 {/* <Typography color="blue-gray" className="font-medium" textGradient>
                   CEO / Co-Founder
                 </Typography> */}
               </CardBody>
-            </Card>
-            <Card className="w-48 m-7">
-              <CardHeader floated={false} className="h-40">
-                <img src="https://icon-library.com/images/wedding-ceremony-icon/wedding-ceremony-icon-4.jpg" className='p-4' alt="profile-picture" />
-              </CardHeader>
-              <CardBody className="text-center">
-                <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Weddings
-                </Typography>
-              </CardBody>
-            </Card>
-            <Card className="w-48 m-7">
-              <CardHeader floated={false} className="h-40">
-                <img src="https://icon-library.com/images/party-icon/party-icon-19.jpg" className='p-4' alt="profile-picture" />
-              </CardHeader>
-              <CardBody className="text-center">
-                <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Party
-                </Typography>
-              </CardBody>
-            </Card>
-            <Card className="w-48 m-7">
-              <CardHeader floated={false} className="h-40">
-                <img src="https://icon-library.com/images/meeting-icon-png/meeting-icon-png-25.jpg" className='p-4' alt="profile-picture" />
-              </CardHeader>
-              <CardBody className="text-center">
-                <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Conferences
-                </Typography>
-                {/* <Typography color="blue-gray" className="font-medium" textGradient>
-                  CEO / Co-Founder
-                </Typography> */}
-              </CardBody>
-            </Card>
-            <Card className="w-48 m-7">
-              <CardHeader floated={false} className="h-40">
-                <img src="https://icon-library.com/images/free-trophy-icon/free-trophy-icon-24.jpg" className='p-4' alt="profile-picture" />
-              </CardHeader>
-              <CardBody className="text-center">
-                <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Competitions
-                </Typography>
-              </CardBody>
-            </Card>
+            </Card>))}
+            
             {
               data.homeData && data.homeData.map((card,index)=>{
                 return(

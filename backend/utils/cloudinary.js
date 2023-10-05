@@ -9,6 +9,7 @@ cloudinary.config({
 
 const uploadToCloudinary = async (path, folder) => {
   try {
+    console.log(path);
     const data = await cloudinary.uploader.upload(path, { folder });
     return { url: data.url, public_id: data.public_id };
   } catch (error) {
@@ -22,6 +23,9 @@ const MultiUploadCloudinary = async (files, folder) => {
     for (const file of files) {
       const { path } = file;
       const result = await uploadToCloudinary(path, folder); 
+      console.log(path,'path');
+      console.log(file,'file');
+      console.log(result,'result');
 
       if (result.url) {
         uploadedImages.push(result.url);

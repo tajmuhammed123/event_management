@@ -13,6 +13,8 @@ const userAuth = async (req, res, next) => {
             console.log(user);
             if (user) {
                 next();
+            }else{
+                res.send('Not a user')
             }
         }
     } catch (error) {

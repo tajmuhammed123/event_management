@@ -1,10 +1,12 @@
 const Manager=require('../Models/managerModel')
 const Booking=require('../Models/bookingData')
+const Events=require('../Models/eventsModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
 const  Tokenmodel =require('../Models/token.js')
 const { sendEmail } = require('../utils/email')
+const { MultiUploadCloudinary, uploadToCloudinary } = require('../utils/cloudinary')
 
 const managerReg = async (req,res)=>{
     try{
@@ -144,26 +146,45 @@ const VerifyPassword=async(req,res)=>{
     }
 }
 
+const getEventData=async(req,res)=>{
+    try {
+        const eventData=await Events.find({is_block:false})
+        console.log(eventData);
+        return res.status(200).json({eventData})
+    } catch (error) {
+        
+    }
+}
+
 const eventData=async(req,res)=>{
     try {
         console.log(req.body);
         console.log(req.files,'images');
+        console.log(req.files,'data');
         const multipleImages = req.files.filter(file => file.fieldname.startsWith('eventdata[profileImage]'))
-        const Imagefilenames = multipleImages.map(file => file.filename)
-        console.log(Imagefilenames);
+console.log("Multiple Images:", multipleImages);
+
+const Imagefilenames = multipleImages.map(file => file.filename)
+console.log("Image Filenames:", Imagefilenames);
+const cloudinarymultipledata = await MultiUploadCloudinary(multipleImages, "images");
+console.log("Cloudinary Multiple Data:", cloudinarymultipledata);
+
         const cover_image = req.files.filter(file => file.fieldname === 'eventdata[cover_image]')
+        console.log(cover_image);
+        const cloudinarydata = await uploadToCloudinary(cover_image[0].path, "categorey")
+        console.log(cloudinarydata);
         const {userID}=req.params
         const exists=await Manager.findById(userID)
         if(exists){
             const {team_name,salutation,about,events,location,dishes,advance_amount}=req.body.eventdata
             const amount=parseInt(advance_amount)
-            console.log(req.body.eventdata);
+            console.log(events);
             const newEvent={
-                cover_image:cover_image[0].filename,
+                cover_image:cloudinarydata.url,
                 team_name,
                 salutation,
                 about,
-                multipleImages:Imagefilenames,
+                multipleImages:cloudinarymultipledata.url,
                 events,
                 location,
                 dishes,
@@ -235,6 +256,7 @@ module.exports={
     uploadImage,
     eventData,
     managerLogin,
+    getEventData,
     forgotPassword,
     VerifyPassword,
     managerData,

@@ -53,7 +53,7 @@ const managerData=async(req,res)=>{
 }
 const userData=async(req,res)=>{
     try {
-        const data=await Payment.find({})
+        const data=await User.find({})
         return res.status(200).json({data:data,status:true})
     } catch (error) {
         console.log(error.message);
@@ -104,14 +104,16 @@ const managerReject=async(req,res)=>{
 
 const addEvent=async(req,res)=>{
     try {
-        const {categorey}=req.body
+        console.log('hjkf');
+        const {categorey,description}=req.body
         console.log(req.file);
         console.log(req.body);
         const cloudinarydata = await uploadToCloudinary(req.file.path, "categorey");
         console.log(cloudinarydata);
         const data= new eventListModel({
             event_name:categorey,
-            event_image:cloudinarydata.url
+            event_image:cloudinarydata.url,
+            description,
         })
         let rslt=await data.save()
         console.log(rslt);

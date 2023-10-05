@@ -1,20 +1,18 @@
 import { useFormik } from "formik";
 import { CategoreySchema } from "../../../Validation/validation";
-import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, Input } from "@material-tailwind/react";
+import { Button, Card, Input, Typography } from "@material-tailwind/react";
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { addEventCategorey } from "../../../actions/AdminActions";
 
 function EventCategory() {
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(!open);
     const queryClient = useQueryClient();
   
     
     const initialValues = {
       categorey:"",
       description:"",
-      eventlogo:[]
+      eventlogo:''
     }
     const {
       values,
@@ -28,9 +26,10 @@ function EventCategory() {
       initialValues:initialValues,
       validationSchema:CategoreySchema,
       onSubmit: async (values,{resetForm}) => {
+        console.log('sub');
+        console.log(formData);
           if(values){
-            addEventCategorey(formData)
-              setOpen(!open);
+            await addEventCategorey(formData)
               console.log(values);
               resetForm()
               queryClient.invalidateQueries("categorey");
@@ -49,20 +48,19 @@ function EventCategory() {
       }
   return (
     <>
-        <Button onClick={handleOpen} className="flex items-center gap-3 bg-[#305861]" size="sm">
-               Add Categorey
-            </Button>
-      <Dialog open={open} handler={handleOpen} size="sm" className="bg-[#CAF0F8]">
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <DialogHeader>ADD CATEGOREY</DialogHeader>
-        <DialogBody className="flex justify-center">
-        <div className="mt-8 mb-2 w-70 max-w-screen-lg sm:w-96">
-        <div className="mb-4 flex flex-col gap-4">
-          <Input size="lg" name="categorey" label="Categorey"
+        <Card color="transparent" shadow={false}>
+      <Typography variant="h4" color="blue-gray">
+        Sign Up
+      </Typography>
+      <Typography color="gray" className="mt-1 font-normal">
+        Enter your details to register.
+      </Typography>
+      <form onSubmit={handleSubmit} className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
+        <div className="mb-4 flex flex-col gap-6">
+          <Input size="lg" label="Name" name="categorey"         
           onChange={handleChange}
           onBlur={handleBlur}
-          value={values.categorey}
-          />
+          value={values.categorey} />
           {touched.categorey && errors.categorey && (
             <div className="text-red-500 text-sm ">{errors.categorey}</div>
           )}
@@ -71,13 +69,11 @@ function EventCategory() {
           onBlur={handleBlur}
           value={values.description}
           />
-          <Input 
-            size="lg" 
-            type="file" 
-            variant="standard" 
-            name="eventlogo"
-            label="Event Logo" 
-            onChange={(event) => {
+          {touched.description && errors.description && (
+            <div className="text-red-500 text-sm ">{errors.description}</div>
+          )}
+          <Input type="file" size="lg" label="Add image" name="eventlogo"            
+          onChange={(event) => {
               const selectedFile = event.currentTarget.files[0];
               console.log(selectedFile);
               setFieldValue("eventlogo", selectedFile);
@@ -92,29 +88,22 @@ function EventCategory() {
             for (const pair of formData.entries()) {
                 console.log(pair[0], pair[1]);
               }
-            }}
-            />
-          {touched.description && errors.description && (
-            <div className="text-red-500 text-sm ">{errors.description}</div>
+            }}/>
+            {touched.eventlogo && errors.eventlogo && (
+            <div className="text-red-500 text-sm ">{errors.eventlogo}</div>
           )}
         </div>
-        </div>
-        </DialogBody>
-        <DialogFooter>
-          <Button
-            variant="text"
-            color="red"
-            onClick={handleOpen}
-            className="mr-1"
-          >
-            <span>Cancel</span>
-          </Button>
-          <Button variant="filled" type="submit" color="green">
-            <span>Confirm</span>
-          </Button>
-        </DialogFooter>
-        </form>
-      </Dialog>
+        <Button className="mt-6" fullWidth type="submit">
+          Register
+        </Button>
+        <Typography color="gray" className="mt-4 text-center font-normal">
+          Already have an account?{" "}
+          <a href="#" className="font-medium text-gray-900">
+            Sign In
+          </a>
+        </Typography>
+      </form>
+    </Card>
     </>
   )
 }

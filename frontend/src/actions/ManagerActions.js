@@ -220,7 +220,7 @@ export const managerDetail = (eventdata,formData)=>async(dispatch)=>{
             Authorization: `Bearer ${managerInfo.token.token}`,
           }
         }
-        console.log(formData.get(`profileImage`))
+        console.log(formData.get(`images`))
         console.log(tokenId.user._id);
         const {data} =await axiosManagerInstance.post(
          `/eventdata/${tokenId.user._id}`,

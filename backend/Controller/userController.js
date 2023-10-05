@@ -1,5 +1,6 @@
 const User=require('../Models/userModels')
 const Manager=require('../Models/managerModel')
+const Events=require('../Models/eventsModel')
 const Booking=require('../Models/bookingData')
 const Payment=require('../Models/transactionModel')
 const bcrypt=require('bcrypt')
@@ -215,6 +216,16 @@ const homeData=async(req,res)=>{
     }
 }
 
+const getEventData=async(req,res)=>{
+    try {
+        const eventData=await Events.find({is_block:false})
+        console.log(eventData);
+        return res.status(200).json({eventData})
+    } catch (error) {
+        
+    }
+}
+
 const detailData=async(req,res)=>{
     try {
         const id = req.query.id
@@ -417,6 +428,7 @@ module.exports={
     forgotPassword,
     VerifyPassword,
     homeData,
+    getEventData,
     detailData,
     eventList,
     managerData,

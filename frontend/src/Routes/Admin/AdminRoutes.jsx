@@ -5,11 +5,13 @@ import AdminHome from '../../Components/Admin/Home/AdminHome'
 import AdminProtect from './AdminProtect'
 import LayOut from '../../Components/Admin/LayOut/LayOut'
 import UserData from '../../Components/Admin/UserData/UserData'
+import EventCategory from '../../Components/Admin/Categories/eventCategory'
 
 let routeObj={
   dashboard:'/dashboard',
   userdata:'/userdata',
   login:'/login',
+  eventcategorey:'/addeventcategorey',
 }
 
 function AdminRoutes() {
@@ -24,6 +26,7 @@ function AdminRoutes() {
               <Route index element={  <AdminHome/> } />
               <Route path={routeObj.dashboard} element={ <AdminHome/> } />
               <Route path={routeObj.userdata} element={ <UserData/> } />
+              <Route path={routeObj.eventcategorey} element={ <EventCategory/> } />
             </Route>
           </Route>
         </Routes>

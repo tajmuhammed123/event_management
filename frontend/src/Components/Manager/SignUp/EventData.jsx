@@ -12,6 +12,8 @@ import {
 import { managerDetail } from '../../../actions/ManagerActions';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { axiosManagerInstance } from '../../../Constants/axios';
+import { useQuery } from '@tanstack/react-query';
 
 function EventData() {
 
@@ -22,11 +24,9 @@ function EventData() {
       team_name: '',
       salutation: '',
       about: '',
-      cover_image:{},
-      events: {},
-      multipleImages:[],
       location: '',
       dishes: '',
+      events:[],
       advance_amount: 0,
     });
   
@@ -38,56 +38,77 @@ function EventData() {
     //   });
     // };
 
-    const [events, setEvents] = useState({
-        wedding:false,
-        birthday:false,
-        party:false,
-        competition:false,
-        conference:false,
-        specialEvents:false
-    });
+    const [data,setEventdata]=useState([])
     
     const [img,setImg]=useState([])
+    const { isLoading, error, } = useQuery({
+        queryKey: ['eventdata'],
+        queryFn: async () => {
+          try {
+            const response = await axiosManagerInstance.get('/geteventdata').then((res)=>setEventdata(res.data.eventData))
+            console.log(response);
+            console.log(response.data.eventData);
+          } catch (err) {
+            console.error(err.message);
+            // Handle error here
+          }
+        },
+      });
+      const [events, setEvents] = useState([]);
+      
     useEffect(()=>{
-        setEvents({
-            wedding: false,
-            birthday: false,
-            party: false,
-            competition: false,
-            conference: false,
-            specialEvents: false,
-          });
-          setImg([])
           console.log(events);
           console.log(img);
     },[])
-  
-    const handleEvents = async (eventName) => {
-        setEvents((prevEvents) => ({
-            ...prevEvents,
-            [eventName]: !prevEvents[eventName],
-        }));
+
+    useEffect(() => {
+        console.log(eventdata); // Log the updated img state here
+      }, [eventdata])
+
+    const handleEvents = (eventName) => {
+        if (!events.includes(eventName)) {
+            events.push(eventName)
+        //   setEvents((prevEvents) => [...prevEvents, eventName]);
+          console.log(events);
+          setEventData((eventdata) =>({...eventdata,events}))
+        } else {
+            const indexToRemove = events.indexOf(eventName);
+            if (indexToRemove !== -1) {
+            events.splice(indexToRemove, 1);
+            }
+        //   setEvents((prevEvents) => prevEvents.filter((event) => event !== eventName));
         console.log(events);
-        setEventData({ ...eventdata, events });
-    };
+          setEventData({...eventdata,events:events})
+        }
+      };
     
 
     const formData = new FormData();
     const handleImages = async (e) => {
     
       try {
-        console.log('fdgf');
-        const fileArray=[]
-        const files = Array.from(e.target.files);
-        files.forEach((file) => {
-            fileArray.push(file)
-        })
-        console.log(files);
-        console.log('hjg');
-        setImg(()=>fileArray)
+        console.log('jkhj');
+            const selectedFiles = e.currentTarget.files;
+            console.log(selectedFiles);
+            const fileArray = Array.from(selectedFiles)
         console.log(fileArray);
-        console.log(img);
-        setEventData({...eventdata,[e.target.name]:fileArray})
+        // const fileArray=[]
+        // const files = Array.from(e.target.files);
+        // files.forEach((file) => {
+        //     fileArray.push(file)
+        // })
+        // console.log(files);
+        // console.log('hjg');
+        // console.log(fileArray);
+        // for (let i = 0; i < fileArray.length; i++) {
+        //     console.log(fileArray[i]);
+        //     formData.append("images", fileArray[i]);
+        //   }
+        setImg(fileArray, () => {
+            // The callback function is executed after the state has been updated
+            console.log(img); // Log the updated img state here
+            setEventData({ ...eventdata, [e.target.name]: img });
+          });
       } catch (error) {
         console.log(error.message);
       }
@@ -105,11 +126,23 @@ function EventData() {
     const handleSubmit = async (e) => {
         e.preventDefault();
             console.log(eventdata);
+            setEventData({...eventdata,events:events})
+            
+            // formData.append('events',events)
+            // formData.append('eventdata',eventdata)
+            // let form=JSON.stringify(formData)
+            // console.log(form);
+            // for (const [key, value] of formData.entries()) {
+            //     console.log(key, value);
+            //   }
+            //   formData.forEach((value, key) => {
+            //     console.log(key, value);
+            //   })
             const response= await dispatch(managerDetail(eventdata,formData))
             console.log(response);
             if (response.status) {
                 localStorage.setItem('managerToken',response.token)
-                navigate('/manager/home/');
+                navigate('/manager/');
             } else {
               navigate('/manager/eventdata');
             }
@@ -140,18 +173,19 @@ function EventData() {
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add Multiple images</label>
                 <input type="file" multiple name="profileImage" onChange={handleImages} />
                 {img.map((file, index) => (
-          <img
-            src={URL.createObjectURL(file)}
-            alt={`Image ${index + 1}`}
-            key={index}
-            className='h-5 w-5'
-            onClick={() => handleDeleteImage(index)}
-          />
-        ))}
+                    <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Image ${index + 1}`}
+                        key={index}
+                        className='h-5 w-5'
+                        onClick={() => handleDeleteImage(index)}
+                    />
+                    ))}
                 </div>
             <div className='flex flex-wrap w-full'>
-            <Checkbox
-            name='wedding'
+            {data.map((item,index) =>(<Checkbox
+            key={index}
+            name={item.event_name}
             onChange={(e)=>handleEvents(e.target.name)}
                 label={
                     <Typography
@@ -159,81 +193,12 @@ function EventData() {
                     color="gray"
                     className="flex items-center mr-5 font-normal"
                     >
-                    Wedding
+                    {item.event_name}
                     </Typography>
                 }
                 containerProps={{ className: "-ml-2.5" }}
-                />
-                <Checkbox
-                name='birthday'
-                onChange={(e)=>handleEvents(e.target.name)}
-                label={
-                    <Typography
-                    variant="small"
-                    color="gray"
-                    className="flex items-center mr-5 font-normal"
-                    >
-                    Birthdays
-                    </Typography>
-                }
-                containerProps={{ className: "-ml-2.5" }}
-                />
-                <Checkbox
-                name='party'
-                onChange={(e)=>handleEvents(e.target.name)}
-                label={
-                    <Typography
-                    variant="small"
-                    color="gray"
-                    className="flex items-center mr-5 font-normal"
-                    >
-                    Party
-                    </Typography>
-                }
-                containerProps={{ className: "-ml-2.5" }}
-                />
-            <Checkbox
-            name='competition'
-            onChange={(e)=>handleEvents(e.target.name)}
-                label={
-                    <Typography
-                    variant="small"
-                    color="gray"
-                    className="flex items-center mr-5 font-normal"
-                    >
-                    Competition
-                    </Typography>
-                }
-                containerProps={{ className: "-ml-2.5" }}
-                />
-                <Checkbox
-                name='conference'
-                onChange={(e)=>handleEvents(e.target.name)}
-                label={
-                    <Typography
-                    variant="small"
-                    color="gray"
-                    className="flex items-center mr-5 font-normal"
-                    >
-                    Conference
-                    </Typography>
-                }
-                containerProps={{ className: "-ml-2.5" }}
-                />
-                <Checkbox
-                name='specialEvents'
-                onChange={(e)=>handleEvents(e.target.name)}
-                label={
-                    <Typography
-                    variant="small"
-                    color="gray"
-                    className="flex items-center mr-5 font-normal"
-                    >
-                    Special Events
-                    </Typography>
-                }
-                containerProps={{ className: "-ml-2.5" }}
-                />
+                />))}
+                
             </div>
                 <div className='flex flex-row gap-2 justify-center'>
                     <Input size="lg" label="Available Dishes" name='dishes' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
