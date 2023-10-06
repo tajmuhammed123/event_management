@@ -8,6 +8,9 @@ const userAuth = async (req, res, next) => {
             console.log(req.headers.authorization);
             let token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JwtSecretKey);
+            if(decoded=='jwt expired'){
+                return res.status(403).json({message:'user expired'})
+            }
             console.log(decoded);
             const user = await User.findOne({ _id: decoded.userId });
             console.log(user);

@@ -19,15 +19,13 @@ import {
 } from "@material-tailwind/react";
 import { axiosAdminInstance } from '../../../Constants/axios';
 import { ManagerApprove, ManagerReject } from '../../../actions/AdminActions';
-import EventCategory from '../Categories/EventCategory';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
  
-const TABLE_HEAD = ["Name", "Salutation", "Location", "Status", "Account", ""];
 function AdminHome() {
 
   const [managerData,setData]=useState([])
-  const [bookData,setBookData]=useState([])
+  
   const [searchInput,setSearchInput]=useState('')
   const TABLE_ROWS = managerData.map((item, index) => (  {
     name: item.name,
@@ -74,7 +72,7 @@ function AdminHome() {
     }
   }
 
-  const TABLE_HEAD = ["Manager ID", "User ID", "Employed", ""];
+  const TABLE_HEAD = ["Manager ID", "User ID", "Employed", "", "", ""];
 
 
   const queryClient=useQueryClient()
@@ -105,28 +103,8 @@ function AdminHome() {
       }
     },
   });
-  const { isLoading:isLoading1, error:error1 } = useQuery({
-    queryKey: ['booking'],
-    queryFn: async () => {
-      try {
-        const userData=localStorage.getItem('adminInfo')
-  const userInfo=JSON.parse(userData)
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userInfo.token.token}`,
-    },
-  };
-        const response = await axiosAdminInstance.get('/getbookingdata',config).then((res)=>{setBookData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
-        setBookData(response.data.data);
-        console.log(bookData);
-      } catch (err) {
-        console.error(err.message);
-      }
-    },
-  });
 
-  if(isLoading2 || isLoading1){
+  if(isLoading2 ){
       return <div className='h-screen w-screen flex items-center justify-center'>
         <Spinner /></div>;
   }
@@ -136,102 +114,12 @@ function AdminHome() {
     const nameMatch = user.name.toLowerCase().includes(searchInputLower);
     return nameMatch ;
   })
-  console.log(bookData);
   
 
   return (
     <>
       <div className='flex justify-end mr-5 my-5'>
       <Button onClick={()=>navigate('/admin/addeventcategorey')}>Add Event Category</Button>
-      </div>
-      <div className='flex justify-center flex-col'>
-        <div className='flex justify-center'>
-        <Typography variant='h2'>TRANSACTIONS</Typography>
-        </div>
-        <div className='flex justify-center'>
-        
-      <Card className="h-full w-1/2 overflow-y-scroll">
-      <table className="w-full min-w-max table-auto text-left">
-        <thead>
-          <tr>
-            {TABLE_HEAD.map((head) => (
-              <th
-                key={head}
-                className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
-              >
-                <Typography
-                  variant="small"
-                  color="blue-gray"
-                  className="font-normal leading-none opacity-70"
-                >
-                  {head}
-                </Typography>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {bookData.map((item, index) => {
-            const isLast = index === bookData.length - 1;
-            const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
- 
-            return (
-              <tr key={item._id}>
-                <td className={classes}>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal"
-                  >
-                    {item.userId}
-                  </Typography>
-                </td>
-                <td className={classes}>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal"
-                  >
-                    {item.managerId}
-                  </Typography>
-                </td>
-                <td className={classes}>
-                        <Chip
-                        className='w-max'
-                          size="sm"
-                          variant="ghost"
-                          value={item.amount}
-                          color={
-                            item.status === "paid"
-                              ? "green"
-                              : item.amount === "not paid"
-                              ? "amber"
-                              : "red"
-                          }
-                        />
-                </td>
-                <td className={classes}>
-                  <Typography
-                    as="a"
-                    href="#"
-                    variant="small"
-                    color="blue-gray"
-                    className="font-medium"
-                  >
-                    {item.status === "paid"
-                              ? "Paid"
-                              : item.amount === "not paid"
-                              ? "Not Paid"
-                              : "Cancelled"}
-                  </Typography>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </Card>
-    </div>
       </div>
       <div className='m-5 flex justify-center flex-col'>
         <div className='flex justify-center'>

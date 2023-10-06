@@ -10,6 +10,10 @@ const managerAuth = async (req, res, next) => {
             let token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JwtSecretKey);
             console.log(decoded);
+            if(decoded=='jwt expired'){
+                console.log('expired');
+                return res.status(403).json({message:'user expired'})
+            }
             const user = await Manager.findOne({ _id: decoded.userId });
             if (user) {
                 next();

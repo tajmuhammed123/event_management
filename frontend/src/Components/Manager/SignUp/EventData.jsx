@@ -26,6 +26,7 @@ function EventData() {
       about: '',
       location: '',
       dishes: '',
+      profileImage:[],
       events:[],
       advance_amount: 0,
     });
@@ -104,11 +105,10 @@ function EventData() {
         //     console.log(fileArray[i]);
         //     formData.append("images", fileArray[i]);
         //   }
-        setImg(fileArray, () => {
-            // The callback function is executed after the state has been updated
-            console.log(img); // Log the updated img state here
-            setEventData({ ...eventdata, [e.target.name]: img });
-          });
+        setImg((prevImg) => [...prevImg, ...fileArray])
+        console.log(img);
+        setEventData({ ...eventdata, [e.target.name]: img });
+        console.log(eventdata);
       } catch (error) {
         console.log(error.message);
       }
@@ -149,44 +149,47 @@ function EventData() {
       }
 
   return (
-    <div className=''>
+    <div className='w-400 md:w-200'>
 
-        <div className='flex justify-center items-center h-screen' >
-            <div>  
-        <Card color="transparent" className='m-0 grid place-items-center shadow-lg rounded-b-none py-8 px-4 text-center' floated={false} shadow={false} style={{border:'1px solid grey-50'}}>
+        <div className='flex justify-center items-center my-9' >
+        <Card color="transparent" className='m-0 grid place-items-center shadow-lg rounded-b-none py-8 px-4 text-center sm:w-100' floated={false} shadow={false} style={{border:'1px solid grey-50'}}>
         <Typography variant="h4" color="blue-gray">
             Handle event
         </Typography>
         <Typography color="gray" className="mt-1 font-normal">
             Enter your details to register.
         </Typography>
-        <form className="mt-8 mb-2 w-200 max-w-screen-lg sm:w-200" onSubmit={handleSubmit} encType="multipart/form-data">
-            <div className="mb-4 flex flex-col gap-6">
-                <div className='flex flex-row gap-2 justify-center'>
-                <Input size="lg" label="Name" name='team_name' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                <Input size="lg" label="Salutation" name='salutation' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                </div>
-            <Textarea size="lg" label="About" name='about' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                <div className='flex flex-wrap w-20'>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add cover image</label>
-                <input name='cover_image' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.files[0]},console.log(e.target.files[0]))} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file"></input>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add Multiple images</label>
-                <input type="file" multiple name="profileImage" onChange={handleImages} />
-                {img.map((file, index) => (
-                    <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Image ${index + 1}`}
-                        key={index}
-                        className='h-5 w-5'
-                        onClick={() => handleDeleteImage(index)}
-                    />
-                    ))}
-                </div>
+        <form className="mt-8 mb-2 lg:w-200 max-w-screen-lg sm:w-200" onSubmit={handleSubmit} encType="multipart/form-data">
+        <div className="mb-4 flex flex-col gap-6">
+            <div className='flex flex-col lg:flex-row gap-2 justify-center'>
+            <div className='flex flex-col lg:flex-row gap-2'>
+                <Input size="lg" label="Name" name='team_name' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+                <Input size="lg" label="Salutation" name='salutation' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            </div>
+            <Input size="lg" type='number' label="Advance Amount" name='advance_amount' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            </div>
+            <Textarea size="lg" label="About" name='about' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            <div className='flex flex-wrap w-20'>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add cover image</label>
+            <input name='cover_image' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.files[0] }, console.log(e.target.files[0]))} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file"></input>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add Multiple images</label>
+            <input type="file" multiple name="profileImage" onChange={handleImages} />
+            {img.map((file, index) => (
+                <img
+                src={URL.createObjectURL(file)}
+                alt={`Image ${index + 1}`}
+                key={index}
+                className='h-5 w-5'
+                onClick={() => handleDeleteImage(index)}
+                />
+            ))}
+            </div>
             <div className='flex flex-wrap w-full'>
-            {data.map((item,index) =>(<Checkbox
-            key={index}
-            name={item.event_name}
-            onChange={(e)=>handleEvents(e.target.name)}
+            {data.map((item, index) => (
+                <Checkbox
+                key={index}
+                name={item.event_name}
+                onChange={(e) => handleEvents(e.target.name)}
                 label={
                     <Typography
                     variant="small"
@@ -197,22 +200,20 @@ function EventData() {
                     </Typography>
                 }
                 containerProps={{ className: "-ml-2.5" }}
-                />))}
-                
+                />
+            ))}
             </div>
-                <div className='flex flex-row gap-2 justify-center'>
-                    <Input size="lg" label="Available Dishes" name='dishes' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                    <Input size="lg" label="Available Locations" name='location' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                    <Input size="lg" type='number' label="Advance Amount" name='advance_amount' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
-                </div>
+            <div className='flex flex-col lg:flex-row gap-2 justify-center'>
+            <Input size="lg" label="Available Dishes" name='dishes' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            <Input size="lg" label="Available Locations" name='location' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
             </div>
-            <Button className="mt-6" fullWidth type='submit'>
+        </div>
+        <Button className="mt-6" fullWidth type='submit'>
             Add/ Update Data
-            </Button>
+        </Button>
         </form>
         </Card>
         <ToastContainer />
-        </div>
         </div>
     </div>
   )
