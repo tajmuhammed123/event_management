@@ -3,6 +3,7 @@ const Manager=require('../Models/managerModel')
 const Events=require('../Models/eventsModel')
 const Booking=require('../Models/bookingData')
 const Payment=require('../Models/transactionModel')
+const Chat=require('../Models/chatModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -418,7 +419,86 @@ const cancelOrder=async(req,res)=>{
         console.log(error.message);
     }
 }
+
+const accessChat = async (req, res) => {
+    console.log('hgjfg');
+    const { userId, mangId } = req.body;
+    console.log(userId, mangId);
   
+    if (!userId) {
+      console.log('User not found');
+      return res.status(400);
+    }
+  
+    try {
+      // Find a chat where the manager's ID matches mangId and the user's ID matches userId
+      let isChat = await Chat.findOne({
+        "users.manager": mangId,
+        "users.user": userId,
+      })
+        .populate('users.user', '-password') // Populate the "user" references
+        .populate('users.manager', '-password') // Populate the "manager" references
+        .populate('latestMessage');
+      console.log(isChat);
+      // If a chat exists, send it
+      if (isChat) {
+        console.log(isChat);
+        res.status(200).json(isChat);
+      } else {
+        // If a chat doesn't exist, create a new one
+        const chatData = {
+          chatName: "sender",
+          isGroupChat: false,
+          users: {
+            manager: mangId,
+            user: userId,
+          },
+        };
+  
+        const createdChat = await Chat.create(chatData);
+        console.log(createdChat);
+  
+        // Populate the "users" field in the created chat
+        const FullChat = await Chat.findOne({ _id: createdChat._id })
+          .populate('users.user', '-password')
+          .populate('users.manager', '-password')
+          .populate('latestMessage');
+        console.log(FullChat,'full');
+        res.status(200).json(FullChat);
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+  const fetchChats=async(req,res)=>{
+    try {
+        console.log('reached');
+        const {userId}=req.params
+        const result = await Chat.find({ "users.user": userId }).populate('users.user', '-password')
+        .populate('users.manager', '-password')
+        .populate('latestMessage').then((result)=>res.send(result));
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+  }  
+  
+  const searchUsers = async (req, res) => {
+    console.log('reached');
+    const keyword = req.query.search
+      ? {
+          $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ],
+        }
+      : {};
+      console.log(keyword);
+  
+    const users = await Manager.find(keyword) //.find({ _id: { $ne: req.user._id } });
+    console.log(users);
+    res.status(200).json(users);
+  };
 
 module.exports={
     userReg,
@@ -436,5 +516,8 @@ module.exports={
     userPayment,
     paymentSuccess,
     orderHistory,
-    cancelOrder
+    cancelOrder,
+    accessChat,
+    fetchChats,
+    searchUsers
 }

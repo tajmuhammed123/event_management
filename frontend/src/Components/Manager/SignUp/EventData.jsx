@@ -14,6 +14,9 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { axiosManagerInstance } from '../../../Constants/axios';
 import { useQuery } from '@tanstack/react-query';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import './EventData.css'
 
 function EventData() {
 
@@ -105,8 +108,7 @@ function EventData() {
         //     console.log(fileArray[i]);
         //     formData.append("images", fileArray[i]);
         //   }
-        setImg((prevImg) => [...prevImg, ...fileArray])
-        console.log(img);
+        img.push(...selectedFiles)
         setEventData({ ...eventdata, [e.target.name]: img });
         console.log(eventdata);
       } catch (error) {
@@ -122,6 +124,9 @@ function EventData() {
         setEventData({...eventdata,profileImage:img})
         console.log(eventdata);
       };
+      useEffect(() => {
+        console.log(img);
+      }, [img]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -174,15 +179,23 @@ function EventData() {
             <input name='cover_image' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.files[0] }, console.log(e.target.files[0]))} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file"></input>
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add Multiple images</label>
             <input type="file" multiple name="profileImage" onChange={handleImages} />
+            <div className='flex flex-row'>
             {img.map((file, index) => (
-                <img
-                src={URL.createObjectURL(file)}
-                alt={`Image ${index + 1}`}
-                key={index}
-                className='h-5 w-5'
-                onClick={() => handleDeleteImage(index)}
-                />
-            ))}
+        <div className="img-container" key={index}>
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`Image ${index + 1}`}
+          />
+          {/* Delete icon using Font Awesome */}
+          <button
+            className="cross-icon flex items-center justify-center"
+            onClick={() => handleDeleteImage(index)}
+          >
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
+        </div>
+      ))}
+      </div>
             </div>
             <div className='flex flex-wrap w-full'>
             {data.map((item, index) => (

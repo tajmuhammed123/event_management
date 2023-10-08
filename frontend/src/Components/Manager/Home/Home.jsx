@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { ImageList, ImageListItem } from '@mui/material';
 import { CelebrationOutlined, EmojiEventsOutlined, FavoriteBorderOutlined, FestivalOutlined, GroupsOutlined } from '@mui/icons-material';
 import { CakeIcon } from '@heroicons/react/24/outline';
+import { UnAvailableDate } from '../Modals/UnAvailableDate';
 
 function Home() {
 
@@ -31,12 +32,11 @@ function Home() {
   console.log(userdata);
   useEffect(()=>{
     console.log(manager);
-    const eventlist = Object.keys(userdata.events)
-    .filter((key) => userdata.events[key] === 'true');
+    const eventlist = userdata.events
     setEventlist(eventlist)
   },[])
   const coverImage= manager.user.eventData
-  ? `/Images/${manager.user.eventData.cover_image}`
+  ? `${manager.user.eventData.cover_image}`
   : 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
   const navigate=useNavigate()
@@ -46,6 +46,9 @@ function Home() {
           <div className='background-container flex justify-center align-middle' style={{ backgroundImage: `url(${coverImage})` }}>
             <h3>Welcome</h3>
             <h1 className='main_text'>Mr.{manager.user.name}</h1>
+          </div>
+          <div className='flex justify-start mr-5 my-5'>
+            <UnAvailableDate />
           </div>
           <div className='m-5'>
             <Button onClick={()=>navigate('/manager/eventdata')}>Add Event Datas</Button>
@@ -156,8 +159,8 @@ function Home() {
               {userdata.multipleImages ? (userdata.multipleImages.map((img,index) => (
                 <ImageListItem key={index}>
                   <img className='rounded-md'
-                    srcSet={`/Images/${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                    src={`/Images/${img}?w=248&fit=crop&auto=format`}
+                    srcSet={`${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                    src={`${img}?w=248&fit=crop&auto=format`}
                     alt={img}
                   />
                 </ImageListItem>

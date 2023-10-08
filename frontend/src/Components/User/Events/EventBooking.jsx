@@ -75,7 +75,7 @@ function EventBooking() {
     });
     const eventArray=[]
     for(const key in eventsdata){
-        if(data.eventData.events[key]=="true"){
+        if(data.eventData.events){
             eventArray.push(key)
         }
     }

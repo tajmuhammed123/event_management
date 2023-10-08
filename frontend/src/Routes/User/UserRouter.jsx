@@ -14,6 +14,12 @@ import Success from '../../Components/User/Payment/Success'
 import { Cancel } from '@mui/icons-material'
 import { Profile } from '../../Components/User/Profile/Profile'
 import OrderHistory from '../../Components/User/OderHistory/OrderHistory'
+import Chat from '../../Components/User/Chat/Chat'
+
+import io from 'socket.io-client'
+import ChatList from '../../Components/User/Chat/ChatList'
+
+const socket=io.connect('http://localhost:4000')
 
 function UserRouter() {
   let routeObj={
@@ -28,6 +34,8 @@ function UserRouter() {
     orderhistory:'/orderhistory',
     profile:'/profile',
     login:'/login',
+    chatlist:'/chatlist',
+    chat:'/chat'
   }
   return (
     <Routes>
@@ -44,6 +52,8 @@ function UserRouter() {
         <Route path={routeObj.cancel} element={<Cancel />}></Route>
         <Route path={routeObj.orderhistory} element={<OrderHistory />}></Route>
         <Route path={routeObj.profile} element={<UserProtect><Profile /></UserProtect>}></Route>
+        <Route path={routeObj.chatlist} element={<ChatList />}></Route>
+        <Route path={routeObj.chat} element={<Chat />}></Route>
       </Route>
     </Routes>
   )

@@ -184,7 +184,7 @@ console.log("Cloudinary Multiple Data:", cloudinarymultipledata);
                 team_name,
                 salutation,
                 about,
-                multipleImages:cloudinarymultipledata.url,
+                multipleImages:cloudinarymultipledata,
                 events,
                 location,
                 dishes,
@@ -192,6 +192,7 @@ console.log("Cloudinary Multiple Data:", cloudinarymultipledata);
 
             }
             if(exists.eventData){
+                console.log(newEvent);
                 await Manager.findOneAndUpdate({ _id: exists._id },
                 { $set: { eventData: newEvent } },
                 { new: true })
