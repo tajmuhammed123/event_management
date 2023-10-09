@@ -31,11 +31,20 @@ export const isSameSenderMargin = (messages, m, i, userId) => {
   
 export const isSameSender = (messages, m, i, userId) => {
   console.log(messages, userId);
+  const currentSenderId =
+    m.sender.manager && m.sender.manager._id
+      ? m.sender.manager._id
+      : m.sender.user._id;
+  const nextSenderId =
+    messages[i + 1] &&
+    (messages[i + 1].sender.manager && messages[i + 1].sender.manager._id
+      ? messages[i + 1].sender.manager._id
+      : messages[i + 1].sender.user._id);
+
   return (
     i < messages.length - 1 &&
-    ((m.sender.manager && m.sender.manager._id) !==
-      (messages[i + 1].sender.manager && messages[i + 1].sender.manager._id)) &&
-    (m.sender.manager && m.sender.manager._id) !== userId
+    currentSenderId !== nextSenderId &&
+    currentSenderId !== userId
   );
 };
   
@@ -63,8 +72,9 @@ export const isSameSender = (messages, m, i, userId) => {
       messages[i-1].sender.manager && messages[i-1].sender.manager._id
         ? messages[i-1].sender.manager._id
         : messages[i-1].sender.user._id;
-        return i > 0 && currentSenderId === previousSenderId;
-      }
+  
+    return i > 0 && currentSenderId === previousSenderId;
+    }
   };
   
   

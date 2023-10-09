@@ -1,6 +1,8 @@
 const Manager=require('../Models/managerModel')
 const Booking=require('../Models/bookingData')
 const Events=require('../Models/eventsModel')
+const User=require('../Models/userModels')
+const Chat=require('../Models/chatModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -251,6 +253,38 @@ const bookingData=async(req,res)=>{
         console.log(error.message);
     }
 }
+const searchUsers=async(req,res)=>{
+    try {
+        console.log('reached');
+        const keyword = req.query.search
+          ? {
+              $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { email: { $regex: req.query.search, $options: "i" } },
+              ],
+            }
+          : {};
+          console.log(keyword);
+      
+        const users = await User.find(keyword) //.find({ _id: { $ne: req.user._id } });
+        console.log(users);
+        res.status(200).json(users);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const fetchChats=async(req,res)=>{
+    try {
+        console.log('reached');
+        const {userId}=req.params
+        const result = await Chat.find({ "users.manager": userId }).populate('users.user', '-password')
+        .populate('users.manager', '-password')
+        .populate('latestMessage').then((result)=>res.send(result));
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 module.exports={
     managerReg,
@@ -262,5 +296,7 @@ module.exports={
     VerifyPassword,
     managerData,
     managerVerify,
-    bookingData
+    bookingData,
+    searchUsers,
+    fetchChats
 }

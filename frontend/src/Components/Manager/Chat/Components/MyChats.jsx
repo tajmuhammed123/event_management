@@ -5,9 +5,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ChatLoading from "./ChatLoading";
 import { Button } from "@chakra-ui/react";
-import { axiosUserInstance } from "../../../../Constants/axios";
+import { axiosManagerInstance, axiosUserInstance } from "../../../../Constants/axios";
 import { ChatState } from "./Context/ChatProvider";
-import { getSender } from "../Config/ChatLogistics";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
@@ -26,7 +25,8 @@ const MyChats = ({ fetchAgain }) => {
       };
       console.log(selectedChat);
       const userId=user.user._id
-      const { data } = await axiosUserInstance.get(`/fetchchat/${userId}`, config);
+      const { data } = await axiosManagerInstance
+      .get(`/fetchchat/${userId}`, config);
       console.log(data);
       setChats(data);
     } catch (error) {
@@ -43,7 +43,7 @@ const MyChats = ({ fetchAgain }) => {
   
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+    setLoggedUser(JSON.parse(localStorage.getItem("managerInfo")));
     fetchChats();
     // eslint-disable-next-line
   }, [fetchAgain]);

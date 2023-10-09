@@ -9,6 +9,7 @@ import ManagerProtect from './ManagerProtect'
 import Bookings from '../../Components/Manager/Bookings/Bookings'
 import LayOut from '../../Components/Manager/LayOut/LayOut'
 import { Profile } from '../../Components/Manager/Profile/Profile'
+import ChatList from '../../Components/Manager/Chat/ChatList'
 
 function ManagerRoutes() {
   let routeObj={
@@ -18,6 +19,7 @@ function ManagerRoutes() {
     bookings:'/bookings',
     profile:'/profile',
     managerverify:'/managerverify/:id',
+    chat:'/chat',
   }
   return (
     <Routes>
@@ -29,6 +31,7 @@ function ManagerRoutes() {
           <Route path={routeObj.managerverify} element={<EmailVerified/>}></Route>
           <Route path={routeObj.bookings} element={<Bookings/>}></Route>
           <Route path={routeObj.profile} element={<ManagerProtect><Profile /></ManagerProtect>}></Route>
+          <Route path={routeObj.chat} element={<ChatList />}></Route>
         </Route>
     </Routes>
   )
