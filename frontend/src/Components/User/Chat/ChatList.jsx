@@ -12,10 +12,10 @@ const ChatList = () => {
   return (
     <div style={{ width: "100%" }}>
       {user && <SideDrawer />}
-      <Box d="flex" justifyContent="space-between" w="100%" h="91.5vh" p="10px">
-        {user && <MyChats fetchAgain={fetchAgain} />}
+      <Box w="100%" h="91.5vh" p="10px" className="flex justify-between p-5">
+        {user && <MyChats fetchAgain={fetchAgain} className="flex h-9" />}
         {user && (
-          <Chatbox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+          <Chatbox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} className="flex h-9" />
         )}
       </Box>
     </div>

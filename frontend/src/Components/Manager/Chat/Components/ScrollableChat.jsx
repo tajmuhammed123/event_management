@@ -1,3 +1,4 @@
+import React, { useEffect, useRef } from 'react';
 import { Avatar } from "@chakra-ui/avatar";
 import { Tooltip } from "@chakra-ui/tooltip";
 import { ChatState } from "./Context/ChatProvider";
@@ -7,18 +8,31 @@ import {
     isSameSenderMargin,
     isSameUser, 
 } from "../Config/ChatLogistics";
-import ScrollableFeed from "react-scrollable-feed";
 
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
+  const chatContainerRef = useRef(null);
+
+  // Scroll to the bottom of the container when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
-    <ScrollableFeed>
+    <div
+      ref={chatContainerRef}
+      style={{
+        maxHeight: '550px', // Set a maximum height for the scrollable container
+        overflowY: 'auto',
+      }}
+    >
       {messages &&
         messages.map((m, i) => (
-          <div style={{ display: "flex" }} key={m._id}>
-            {(isSameSender(messages, m, i, user._id) ||
-              isLastMessage(messages, i, user._id)) && (
+          <div style={{ display: "flex" }} key={i}>
+            {(isSameSender(messages, m, i, user.user._id) ||
+              isLastMessage(messages, i, user.user._id)) && (
               <Tooltip label={m.sender.name} placement="bottom-start" hasArrow>
                 {m.sender.pic ? (
                   <Avatar
@@ -39,17 +53,23 @@ const ScrollableChat = ({ messages }) => {
                     cursor="pointer"
                     name={m.sender.name}
                     src='https://www.clipartmax.com/png/small/54-546487_a-little-over-a-month-ago-i-had-lasik-surgery-user-profile.png'
-                  /> // Ensure there's always a child element
+                  />
                 )}
               </Tooltip>
             )}
             <span
               style={{
                 backgroundColor: `${
-                  m.sender._id === user._id ? "#BEE3F8" : "#B9F5D0"
+                  m.sender.manager
+                    ? m.sender.manager._id === user.user._id
+                      ? "#BEE3F8"
+                      : "#B9F5D0"
+                    : m.sender.user._id === user.user._id
+                    ? "#BEE3F8"
+                    : "#B9F5D0"
                 }`,
-                marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
+                marginLeft: isSameSenderMargin(messages, m, i, user.user._id),
+                marginTop: isSameUser(messages, m, i, user.user._id) ? 3 : 10,
                 borderRadius: "20px",
                 padding: "5px 15px",
                 maxWidth: "75%",
@@ -59,7 +79,7 @@ const ScrollableChat = ({ messages }) => {
             </span>
           </div>
         ))}
-    </ScrollableFeed>
+    </div>
   );
 };
 

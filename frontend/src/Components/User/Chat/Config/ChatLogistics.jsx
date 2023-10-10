@@ -1,24 +1,25 @@
 export const isSameSenderMargin = (messages, m, i, userId) => {
-  // console.log(i === messages.length - 1);
-
   const currentSenderId =
-    m.sender.manager && m.sender.manager._id
-      ? m.sender.manager._id
-      : m.sender.user && m.sender.user._id; // Check sender.user as well
+    (m.sender.manager && m.sender.manager._id) || // Check sender.manager
+    (m.sender.user && m.sender.user._id); // Check sender.user
 
   if (
     i < messages.length - 1 &&
-    messages[i + 1].sender.manager &&
-    messages[i + 1].sender.manager._id === currentSenderId &&
+    (messages[i + 1].sender.manager &&
+      messages[i + 1].sender.manager._id === currentSenderId ||
+      (messages[i + 1].sender.user &&
+        messages[i + 1].sender.user._id === currentSenderId)) &&
     currentSenderId !== userId
   ) {
     return 33;
   } else if (
     (i < messages.length - 1 &&
-      (!messages[i + 1].sender.manager ||
+      ((!messages[i + 1].sender.manager ||
         messages[i + 1].sender.manager._id !== currentSenderId) &&
-      m.sender.manager && // Check m.sender.manager as well
-      m.sender.manager._id !== userId) ||
+        (!messages[i + 1].sender.user ||
+          messages[i + 1].sender.user._id !== currentSenderId)) &&
+      ((m.sender.manager && m.sender.manager._id !== userId) ||
+        (m.sender.user && m.sender.user._id !== userId))) ||
     (i === messages.length - 1 && currentSenderId !== userId)
   ) {
     return 0;
@@ -33,9 +34,9 @@ export const isSameSender = (messages, m, i, userId) => {
   console.log(messages, userId);
   return (
     i < messages.length - 1 &&
-    ((m.sender.manager && m.sender.manager._id) !==
-      (messages[i + 1].sender.manager && messages[i + 1].sender.manager._id)) &&
-    (m.sender.manager && m.sender.manager._id) !== userId
+    ((m.sender.user && m.sender.user._id) !==
+      (messages[i + 1].sender.user && messages[i + 1].sender.user._id)) &&
+    (m.sender.user && m.sender.user._id) !== userId
   );
 };
   

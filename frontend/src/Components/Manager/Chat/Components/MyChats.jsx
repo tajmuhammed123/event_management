@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ChatLoading from "./ChatLoading";
 import { Button } from "@chakra-ui/react";
-import { axiosManagerInstance, axiosUserInstance } from "../../../../Constants/axios";
+import { axiosManagerInstance } from "../../../../Constants/axios";
 import { ChatState } from "./Context/ChatProvider";
 
 const MyChats = ({ fetchAgain }) => {

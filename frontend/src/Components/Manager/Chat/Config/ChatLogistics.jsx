@@ -1,24 +1,25 @@
 export const isSameSenderMargin = (messages, m, i, userId) => {
-  // console.log(i === messages.length - 1);
-
   const currentSenderId =
-    m.sender.manager && m.sender.manager._id
-      ? m.sender.manager._id
-      : m.sender.user && m.sender.user._id; // Check sender.user as well
+    (m.sender.manager && m.sender.manager._id) || // Check sender.manager
+    (m.sender.user && m.sender.user._id); // Check sender.user
 
   if (
     i < messages.length - 1 &&
-    messages[i + 1].sender.manager &&
-    messages[i + 1].sender.manager._id === currentSenderId &&
+    (messages[i + 1].sender.manager &&
+      messages[i + 1].sender.manager._id === currentSenderId ||
+      (messages[i + 1].sender.user &&
+        messages[i + 1].sender.user._id === currentSenderId)) &&
     currentSenderId !== userId
   ) {
     return 33;
   } else if (
     (i < messages.length - 1 &&
-      (!messages[i + 1].sender.manager ||
+      ((!messages[i + 1].sender.manager ||
         messages[i + 1].sender.manager._id !== currentSenderId) &&
-      m.sender.manager && // Check m.sender.manager as well
-      m.sender.manager._id !== userId) ||
+        (!messages[i + 1].sender.user ||
+          messages[i + 1].sender.user._id !== currentSenderId)) &&
+      ((m.sender.manager && m.sender.manager._id !== userId) ||
+        (m.sender.user && m.sender.user._id !== userId))) ||
     (i === messages.length - 1 && currentSenderId !== userId)
   ) {
     return 0;
@@ -28,9 +29,9 @@ export const isSameSenderMargin = (messages, m, i, userId) => {
 };
 
 
+
   
 export const isSameSender = (messages, m, i, userId) => {
-  console.log(messages, userId);
   const currentSenderId =
     m.sender.manager && m.sender.manager._id
       ? m.sender.manager._id
@@ -49,7 +50,6 @@ export const isSameSender = (messages, m, i, userId) => {
 };
   
   export const isLastMessage = (messages, i, userId) => {
-    console.log(messages);
     const lastSenderId =
       messages[messages.length - 1].sender.manager &&
       messages[messages.length - 1].sender.manager._id
@@ -62,8 +62,6 @@ export const isSameSender = (messages, m, i, userId) => {
   
   export const isSameUser = (messages, m, i) => {
     if(i > 0){
-    console.log(messages[i - 1]);
-    console.log(i);
     const currentSenderId =
       m.sender.manager && m.sender.manager._id
         ? m.sender.manager._id
@@ -79,8 +77,6 @@ export const isSameSender = (messages, m, i, userId) => {
   
   
   export const getSender = (loggedUser, users) => {
-    console.log(users,'users');
-    console.log(loggedUser,'loggedusers');
     return users[0]?._id === loggedUser?._id ? users[1].name : users[0].name;
   };
   

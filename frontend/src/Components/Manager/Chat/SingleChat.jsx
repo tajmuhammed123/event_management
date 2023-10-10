@@ -8,6 +8,7 @@ import './style.css'
 import io from "socket.io-client";
 import { ChatState } from "./Components/Context/ChatProvider";
 import Lottie from "lottie-react";
+import animationData from './TypingAnimation/typing.json'
 import { axiosManagerInstance, axiosUserInstance } from "../../../Constants/axios";
 import ScrollableChat from "./Components/ScrollableChat";
 const ENDPOINT = "http://localhost:4000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
@@ -25,6 +26,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const defaultOptions = {
     loop: true,
     autoplay: true,
+    animationData:animationData,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
@@ -32,7 +34,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
 
-  const fetchMessages = async () => {
+  const  fetchMessages = async () => {
     if (!selectedChat) return;
 
     try {
@@ -118,20 +120,36 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   }, [selectedChat]);
 
   useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
+    const handleNewMessageReceived = (newMessageReceived) => {
+      console.log('New message received:', newMessageReceived);
+      console.log('Selected chat compare:', selectedChatCompare);
+  
       if (
-        !selectedChatCompare || // if chat is not selected or doesn't match current chat
-        selectedChatCompare._id !== newMessageRecieved.chat._id
+        !selectedChatCompare || // If chat is not selected or doesn't match the current chat
+        selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
+        if (!notification.includes(newMessageReceived)) {
+          setNotification([newMessageReceived, ...notification]);
           setFetchAgain(!fetchAgain);
         }
       } else {
-        setMessages([...messages, newMessageRecieved]);
+        // Update the messages state to include the new message while preserving previous messages
+        setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
       }
-    });
-  });
+    };
+  
+    // Register the event listener
+    socket.on("message received", handleNewMessageReceived);
+  
+    // Cleanup: Remove the event listener when the component unmounts
+    return () => {
+      // Unregister the event listener
+      socket.off("message received", handleNewMessageReceived);
+    };
+  }, [selectedChatCompare, notification, fetchAgain]);
+  
+  
+  
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -181,7 +199,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             p={3}
             bg="#E8E8E8"
             w="100%"
-            h="100%"
+            h="90%"
             borderRadius="lg"
             overflowY="hidden"
           >
@@ -207,12 +225,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             >
               {istyping ? (
                 <div>
-                  <Lottie
+                  {/* <Lottie
                     options={defaultOptions}
                     // height={50}
                     width={70}
                     style={{ marginBottom: 15, marginLeft: 0 }}
-                  />
+                  /> */}
+                  <p width={70}
+                    style={{ marginBottom: 15, marginLeft: 0, color:'gray' }}>
+                      Typing...</p>
                 </div>
               ) : (
                 <></>

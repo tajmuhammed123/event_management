@@ -280,7 +280,19 @@ const fetchChats=async(req,res)=>{
         const {userId}=req.params
         const result = await Chat.find({ "users.manager": userId }).populate('users.user', '-password')
         .populate('users.manager', '-password')
-        .populate('latestMessage').then((result)=>res.send(result));
+        .populate('latestMessage').populate({
+            path: 'latestMessage',
+            populate: {
+              path: 'sender.manager',
+              select: '-password',
+            },
+          }).populate({
+            path: 'latestMessage',
+            populate: {
+              path: 'sender.user',
+              select: '-password',
+            },
+          }).then((result)=>{console.log(result),res.send(result)});
     } catch (error) {
         console.log(error.message);
     }

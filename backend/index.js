@@ -14,32 +14,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log(`User Connected: ${socket.id}`);
-
-  socket.on("join_room", (data) => {
-    socket.join(data);
-    console.log(`User with ID: ${socket.id} joined room: ${data}`);
-  });
-
-  socket.on("send_message", (data) => {
-    socket.to(data.room).emit("receive_message", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
-  });
-});
-
 const userRouter = require('./Routes/userRoutes');
 app.use('/', userRouter);
 const adminRouter = require('./Routes/adminRoutes');
@@ -47,6 +21,55 @@ app.use('/admin/', adminRouter);
 const managerRouter = require('./Routes/mangerRoutes');
 app.use('/manager/', managerRouter);
 
-server.listen(4000, () => {
+const server = app.listen(4000, () => {
   console.log('server running at 4000');
 });
+
+const io=require('socket.io')(server,{
+  pingTimeout:60000,
+  cors:{
+    origin:'http://localhost:3000'
+  }
+})
+
+io.on("connection",(socket)=>{
+  console.log('connected to socket.io');
+
+  socket.on("setup",(userData)=>{
+    socket.join(userData._id)
+    socket.emit('connected')
+  })
+
+  socket.on('join chat',(room)=>{
+    socket.join(room)
+    console.log('user joined in the room: '+room);
+  })
+
+  socket.on('typing',(room)=>socket.in(room).emit('typing'))
+  socket.on('stop typing',(room)=>socket.in(room).emit('stop typing'))
+
+  socket.on('new message', (newMessageRecieved) => {
+    const chat = newMessageRecieved.chat;
+    console.log(newMessageRecieved.sender);
+  
+    // Extract the user IDs from the chat's users object
+    const userKeys = Object.keys(chat.users);
+  
+    userKeys.forEach((userKey) => {
+      const user = chat.users[userKey];
+      const senderUserId = newMessageRecieved.sender.user
+        ? newMessageRecieved.sender.user._id
+        : newMessageRecieved.sender.manager._id;
+  
+      // Compare the user's ID with the sender's ID
+      if (userKey !== senderUserId) {
+        console.log(user);
+        let access = user.user ? user.manager : user.user;
+        console.log(access);
+        socket.to(access).emit('message received', newMessageRecieved);
+      }
+    });
+  });
+  
+
+})
