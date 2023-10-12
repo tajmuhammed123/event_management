@@ -271,7 +271,7 @@ function Home() {
         <div className='flex flex-col pt-7 w-full mm bg-gray-100'>
           <h1 className='flex justify-center text-2xl font-bold mb-4'>AVAILABLE SERVICES</h1>
           <div className="flex flex-wrap gap-2 justify-center w-full px-10">
-            {events.map((item,index)=>(<Card className="w-48 m-7 cursor-pointer" onClick={()=>navigate('/eventlist/birthday')} key={index}>
+            {events.map((item,index)=>(<Card className="w-48 m-7 cursor-pointer" onClick={()=>navigate(`/eventlist/${item.event_name}`)} key={index}>
               <CardHeader floated={false} className="h-40">
                 <img className='p-2' src={item.event_image} />
               </CardHeader>

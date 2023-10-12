@@ -1,3 +1,4 @@
+import { EditIcon } from "@chakra-ui/icons";
 import {
   Card,
   CardHeader,
@@ -6,10 +7,12 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
  
 export function Profile() {
   const {manager}=useSelector(state=>state.managerInfo)
   console.log(manager);
+  const navigate=useNavigate()
   return (
       <>
   <div className="flex mt-8 align-middle items-center h-screen flex-col">
@@ -25,6 +28,9 @@ export function Profile() {
         color="transparent"
         className="p-4 rounded-none"
       >
+        <div className="flex justify-end">
+            <EditIcon onClick={()=>navigate(`/manageredit/${manager.user._id}`)}/>
+          </div>
       <Avatar
         size="lg"
         variant="circular"

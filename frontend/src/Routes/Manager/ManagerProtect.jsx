@@ -4,7 +4,7 @@ function ManagerProtect(props) {
     if(localStorage.getItem('managerInfo')){
         return props.children;
       }else{
-        return <Navigate to='/manager/'/>
+        return <Navigate to='/manager/login/'/>
       }
 }
 

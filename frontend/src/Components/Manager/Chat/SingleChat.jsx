@@ -11,6 +11,7 @@ import Lottie from "lottie-react";
 import animationData from './TypingAnimation/typing.json'
 import { axiosManagerInstance, axiosUserInstance } from "../../../Constants/axios";
 import ScrollableChat from "./Components/ScrollableChat";
+import { Button } from "@material-tailwind/react";
 const ENDPOINT = "http://localhost:4000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
@@ -134,7 +135,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         }
       } else {
         // Update the messages state to include the new message while preserving previous messages
-        setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+        setMessages([...messages, newMessageReceived]);
       }
     };
   
@@ -146,7 +147,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       // Unregister the event listener
       socket.off("message received", handleNewMessageReceived);
     };
-  }, [selectedChatCompare, notification, fetchAgain]);
+  }, [selectedChatCompare, notification, fetchAgain,messages]);
   
   
   
@@ -170,6 +171,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setTyping(false);
       }
     }, timerLength);
+  };
+
+  const isMessageSender = (currentUser, selectedChat) => {
+    return (
+      selectedChat.sender && currentUser.manager._id === selectedChat.sender._id
+    );
   };
 
   return (
@@ -213,38 +220,31 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
             ) : (
               <div className="messages">
-                <ScrollableChat messages={messages} />
+                <ScrollableChat messages={messages} user={user} />
               </div>
             )}
-
-            <FormControl
-              onKeyDown={sendMessage}
-              id="first-name"
-              isRequired
-              mt={3}
-            >
-              {istyping ? (
-                <div>
-                  {/* <Lottie
-                    options={defaultOptions}
-                    // height={50}
-                    width={70}
-                    style={{ marginBottom: 15, marginLeft: 0 }}
-                  /> */}
-                  <p width={70}
-                    style={{ marginBottom: 15, marginLeft: 0, color:'gray' }}>
-                      Typing...</p>
-                </div>
-              ) : (
-                <></>
-              )}
-              <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message.."
-                value={newMessage}
-                onChange={typingHandler}
-              />
+            {istyping && !isMessageSender(user, selectedChat) ? ( // Check if sender is not the current user
+              <div>
+                <p style={{ marginBottom: 8, marginLeft: 0, color: "gray" }}>
+                  Typing...
+                </p>
+              </div>
+            ) : (
+              <></>
+            )}
+            <FormControl className="w-full pt-3" id="first-name" isRequired>
+              <div className="relative flex w-full">
+                <Input
+                  className="w-full"
+                  borderRadius={15}
+                  bg="#E0E0E0"
+                  placeholder="Enter a message..."
+                  value={newMessage}
+                  onChange={typingHandler}
+                  onKeyDown={sendMessage}
+                />
+                <Button onClick={sendMessage}>Send</Button>
+              </div>
             </FormControl>
           </Box>
         </>

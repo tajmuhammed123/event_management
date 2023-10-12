@@ -13,7 +13,7 @@ const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
   const chatContainerRef = useRef(null);
 
-  // Scroll to the bottom of the container when new messages arrive
+
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -24,7 +24,7 @@ const ScrollableChat = ({ messages }) => {
     <div
       ref={chatContainerRef}
       style={{
-        maxHeight: '550px', // Set a maximum height for the scrollable container
+        maxHeight: '500px',
         overflowY: 'auto',
       }}
     >

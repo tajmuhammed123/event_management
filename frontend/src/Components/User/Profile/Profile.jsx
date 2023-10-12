@@ -1,3 +1,4 @@
+import { EditIcon } from "@chakra-ui/icons";
 import {
     Card,
     CardHeader,
@@ -9,12 +10,14 @@ import {
     Button,
   } from "@material-tailwind/react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
    
   export function Profile() {
     const userInfoString = localStorage.getItem("userInfo");
 
     const userInfo = JSON.parse(userInfoString)
     console.log(userInfo);
+    const navigate=useNavigate()
     return (
         <>
     <div className="flex mt-8 align-middle items-center h-screen flex-col">
@@ -30,14 +33,20 @@ import { useSelector } from "react-redux";
           color="transparent"
           className="p-4 rounded-none"
         >
-        <Avatar
-          size="lg"
-          variant="circular"
-          src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-          alt="tania andrew"
-          className="mb-2"
-        />
+        <div>
+          <div className="flex justify-end">
+            <EditIcon onClick={()=>navigate(`/useredit/${userInfo.user._id}`)}/>
+          </div>
+          <Avatar
+            size="lg"
+            variant="circular"
+            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+            alt="tania andrew"
+            className="mb-2"
+          />
+        </div>
         <div className="flex w-full flex-col gap-0.5">
+          
           <div className="flex items-center justify-between">
             <Typography variant="h4" color="blue-gray">
               {userInfo.user.name}

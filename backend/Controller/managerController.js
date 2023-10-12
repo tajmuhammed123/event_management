@@ -3,6 +3,7 @@ const Booking=require('../Models/bookingData')
 const Events=require('../Models/eventsModel')
 const User=require('../Models/userModels')
 const Chat=require('../Models/chatModel')
+const Review=require('../Models/reviewModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -212,8 +213,10 @@ console.log("Cloudinary Multiple Data:", cloudinarymultipledata);
 
 const managerData=async(req,res)=>{
     try {
-        const manager=await Manager.findById(req.userId)
-        return res.status(200).json({data:manager, status:true})
+        const {id}=req.params
+        const manager=await Manager.findById(id)
+        const review=await Review.find({manager:id})
+        return res.status(200).json({data:manager, status:true, review:review})
 
     } catch (error) {
         console.log(error.message);

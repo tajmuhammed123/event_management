@@ -52,7 +52,6 @@ io.on("connection",(socket)=>{
     const chat = newMessageRecieved.chat;
     console.log(newMessageRecieved.sender);
   
-    // Extract the user IDs from the chat's users object
     const userKeys = Object.keys(chat.users);
   
     userKeys.forEach((userKey) => {
@@ -61,12 +60,11 @@ io.on("connection",(socket)=>{
         ? newMessageRecieved.sender.user._id
         : newMessageRecieved.sender.manager._id;
   
-      // Compare the user's ID with the sender's ID
       if (userKey !== senderUserId) {
         console.log(user);
         let access = user.user ? user.manager : user.user;
         console.log(access);
-        socket.to(access).emit('message received', newMessageRecieved);
+        socket.to(access).emit("message received", newMessageRecieved);
       }
     });
   });

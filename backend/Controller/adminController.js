@@ -1,6 +1,7 @@
 const User=require('../Models/userModels')
 const Manager=require('../Models/managerModel')
 const Payment=require('../Models/transactionModel')
+const Report=require('../Models/reportModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -96,7 +97,7 @@ const managerReject=async(req,res)=>{
         const {id}=req.body
         const data=await Manager.findOneAndUpdate({_id:id},{$set:{is_authorized:false}},{upsert:true})
         console.log(data);
-        return res.status(200).json({alert:"Rejected",status:false})
+        return res.status(200).json({alert:"Rejected",status:false, success:true})
     } catch (error) {
         console.log(error.message);
     }
@@ -122,6 +123,24 @@ const addEvent=async(req,res)=>{
     }
 }
 
+const reportData=async(req,res)=>{
+    try {
+        const data=await Report.find({}).populate('manager')
+        return res.status(200).json({data})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const reportDetail=async(req,res)=>{
+    try {
+        const {id}=req.params
+        const data=await Report.find({manager:id}).populate('manager')
+        return res.status(200).json({data})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 module.exports={
     adminLogin,
     managerData,
@@ -130,5 +149,7 @@ module.exports={
     userBlock,
     managerApprove,
     managerReject,
-    addEvent
+    addEvent,
+    reportData,
+    reportDetail
 }

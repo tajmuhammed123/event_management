@@ -330,6 +330,25 @@ export const cancelOrder= async(id)=>{
       console.log(error.message);
   }
 }
+export const updateProfile= async(values)=>{
+  try {
+    console.log('njh');
+    console.log(values);
+    const userData=localStorage.getItem('userInfo')
+    const userInfo=JSON.parse(userData)
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userInfo.token.token}`,
+      },
+    }
+      const data=await axiosUserInstance.post('/updateuserprofile',values,config)
+      console.log(data);
+      return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}
 
 
 // {"user":{"_id":"64f57c95b7cf0bdbf770373c","name":"Taj Muhammed","mob":9895299091,"email":"tajmuhammed0011@gmail.com","password":"$2b$10$dSEbzqbx8Ej6HcV26FTrtus1ua9laxeKdxINs9Dk3m11JRKWkQbSC","is_manager":false,"is_admin":false,"__v":0,"is_verified":true},

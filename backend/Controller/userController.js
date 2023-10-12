@@ -4,6 +4,8 @@ const Events=require('../Models/eventsModel')
 const Booking=require('../Models/bookingData')
 const Payment=require('../Models/transactionModel')
 const Chat=require('../Models/chatModel')
+const Review=require('../Models/reviewModel')
+const Report=require('../Models/reportModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -12,6 +14,7 @@ const  Tokenmodel =require('../Models/token.js')
 const {sendEmail} =require('../utils/email')
 const { default: Stripe } = require('stripe')
 const { useParams } = require('react-router-dom')
+const { uploadToCloudinary } = require('../utils/cloudinary')
 
 const generateOtp = () => {
     let otp = "";
@@ -233,8 +236,9 @@ const detailData=async(req,res)=>{
         console.log(id);
         const detailData=await Manager.findById(id)
         console.log(detailData);
+        const reviewData=await Review.find({manager:id}).populate('user','name')
         const result=detailData.eventData
-        return res.status(200).json({result})
+        return res.status(200).json({result,review:reviewData})
     } catch (error) {
         console.log(error.message);
     }
@@ -518,6 +522,78 @@ const accessChat = async (req, res) => {
     res.status(200).json(users);
   };
 
+  const submitReview=async(req,res)=>{
+    try {
+        const {content,rating,managId,userId}=req.body
+        const data=await Booking.findOne({user_id:userId,manager_id:managId})
+        console.log(data);
+        if(data){
+            console.log(req.body);
+            await new Review({
+                user:userId,
+                starcount:rating,
+                content:content,
+                manager:managId
+            }).save()
+            return res.status(200).json({status:true})
+        }else{
+            return res.status(200).json({message:'You need to purchase to review'})
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+  }
+  const submitReport=async(req,res)=>{
+    try {
+        const {report,managId,userId}=req.body
+        const data=await Booking.findOne({user_id:userId,manager_id:managId})
+        console.log(data);
+        if(data){
+            console.log(req.body);
+            await new Report({
+                content:report,
+                manager:managId
+            }).save()
+            return res.status(200).json({status:true})
+        }else{
+            return res.status(200).json({message:'You need to purchase to report'})
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+  }
+
+  const updateUser=async(req,res)=>{
+    try {
+      const cloudinarydata = await uploadToCloudinary(req.file.path, "profile_img");
+console.log(cloudinarydata);
+
+  const mob = parseInt(req.body.mob, 10);
+
+  console.log(req.body, 'body');
+  let data = req.body;
+
+  await User.findOneAndUpdate(
+    { _id: req.body.id },
+    {
+      $set: {
+        name: data.name,
+        mob: mob, // Use the parsed "mob" value as an integer
+        profile_img: cloudinarydata.url,
+      }
+    }
+  );
+  let user = await User.findOne(
+    { _id: req.body.id }
+  );
+  console.log(user);
+  return res.status(200).json({status:true})
+
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
 module.exports={
     userReg,
     userLogin,
@@ -537,5 +613,8 @@ module.exports={
     cancelOrder,
     accessChat,
     fetchChats,
-    searchUsers
+    searchUsers,
+    submitReview,
+    submitReport,
+    updateUser
 }

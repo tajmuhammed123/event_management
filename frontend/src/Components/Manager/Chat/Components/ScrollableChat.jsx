@@ -24,7 +24,7 @@ const ScrollableChat = ({ messages }) => {
     <div
       ref={chatContainerRef}
       style={{
-        maxHeight: '550px', // Set a maximum height for the scrollable container
+        maxHeight: '500px', // Set a maximum height for the scrollable container
         overflowY: 'auto',
       }}
     >

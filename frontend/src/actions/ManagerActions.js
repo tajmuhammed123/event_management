@@ -242,3 +242,22 @@ export const managerDetail = (eventdata,formData)=>async(dispatch)=>{
     }
 }
 
+export const updateProfile= async(values)=>{
+  try {
+    console.log('njh');
+    console.log(values);
+    const userData=localStorage.getItem('managerInfo')
+    const userInfo=JSON.parse(userData)
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userInfo.token.token}`,
+      },
+    }
+      const data=await axiosManagerInstance.post('/updatemanagerprofile',values,config)
+      console.log(data);
+      return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}

@@ -6,7 +6,9 @@ import {
   Typography,
   Card,
   Button,
-  IconButton
+  IconButton,
+  CardBody,
+  Avatar
 } from "@material-tailwind/react"
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,8 +21,30 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { axiosUserInstance } from '../../../Constants/axios';
 import { ImageList, ImageListItem } from '@mui/material';
 import CakeIcon from '@mui/icons-material/Cake';
-import { Celebration, CelebrationOutlined, EmojiEvents, EmojiEventsOutlined, FavoriteBorderOutlined, FestivalOutlined, GroupsOutlined } from '@mui/icons-material';
+import { Celebration, CelebrationOutlined, ChatBubble, EmojiEvents, EmojiEventsOutlined, FavoriteBorderOutlined, FestivalOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Footer } from '../Common/Footer';
+import { ChatState } from '../Chat/Components/Context/ChatProvider';
+import { ToastContainer, toast } from 'react-toastify';
+import { StarIcon } from '@chakra-ui/icons';
+import { ReviewModal } from './reviewModal';
+import { ReportModal } from './ReportModal';
+
+function Star() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="h-5 w-5 text-yellow-700"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
    
   // function CheckIcon() {
   //   return (
@@ -43,9 +67,15 @@ import { Footer } from '../Common/Footer';
 
 function About() {
 
+  const {
+    setSelectedChat,
+    chats,
+    setChats,
+  } = ChatState();
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [review, setReview] = useState([]);
   const [eventlist, setEventlist] = useState([]);
 
   useEffect(() => {
@@ -53,10 +83,10 @@ function About() {
       try {
         const response = await axiosUserInstance.get(`/detailpage?id=${id}`);
         setData(response.data.result);
-        console.log(response.data.result);
+        setReview(response.data.review)
+        console.log(response.data.review);
 
-        const eventlist = Object.keys(response.data.result.events)
-          .filter((key) => response.data.result.events[key] === 'true');
+        const eventlist = response.data.result.events
           setEventlist(eventlist)
       } catch (error) {
         console.log(error.message);
@@ -68,6 +98,40 @@ function About() {
 
   console.log(data);
 
+  const handleChat=async()=>{
+    try {
+      // const config = {
+      //   headers: {
+      //     "Content-type": "application/json",
+      //     Authorization: `Bearer ${user.user.token}`,
+      //   },
+      // };
+      // const userId=user.user._id
+      if(localStorage.getItem("userInfo")){
+
+        const userInfoString = localStorage.getItem("userInfo");
+  
+        const userInfo = JSON.parse(userInfoString)
+        const userId=userInfo.user._id
+        const mangId=id
+        const { data } = await axiosUserInstance.post(`/accesschat`, { mangId,userId });
+        console.log(data);
+  
+        if (!chats.find((c) => c._id === data._id)) {
+          console.log('nothing');
+          setChats([data, ...chats])}
+        console.log(data,'data');
+        console.log(chats,'chat');
+        setSelectedChat(data);
+        navigate('/chatlist')
+      }else{
+        toast('Login to chat')
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   return (
     <>
         <div>
@@ -78,9 +142,13 @@ function About() {
         <div className='main-content'>
         <div className='flex justify-between p-5'>
         <Button onClick={()=>navigate(`/eventbooking/${id}`)}>Book Slot</Button>
-        <IconButton color="red" className="rounded-full">
+        <ChatBubble style={{ fontSize: '45px' }} onClick={handleChat}/>
+        {/* <IconButton color="red" className="rounded-full">
         <FontAwesomeIcon icon={faHeart} />
-      </IconButton>
+      </IconButton> */}
+        </div>
+        <div className='px-5'>
+          {localStorage.getItem("userInfo")?<ReportModal id={id}/>:<Button>Report</Button>}
         </div>
           <div  className='flex align-middle justify-center w-100 mt-10'>
           <Card color="gray" variant="gradient" className="w-full max-w-[25rem] p-5 flex justify-center">
@@ -123,7 +191,7 @@ function About() {
                   variant="h1"
                   color="white"
                   className=" flex justify-center gap-1 text-7xl font-normal"
-                  >4
+                  >{review.length}
                 </Typography>
               </CardHeader>
               <CardHeader
@@ -188,8 +256,8 @@ function About() {
               {data.multipleImages ? (data.multipleImages.map((img,index) => (
                 <ImageListItem key={index}>
                   <img className='rounded-md'
-                    srcSet={`/Images/${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                    src={`/Images/${img}?w=248&fit=crop&auto=format`}
+                    srcSet={`${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                    src={`${img}?w=248&fit=crop&auto=format`}
                     alt={img}
                   />
                 </ImageListItem>
@@ -207,7 +275,52 @@ function About() {
                       <p>About is not provided</p>
                       )}
               </div>
+              <ToastContainer/>
           </div>
+          <div className='flex flex-col pt-7 w-full mm bg-gray-100'>
+          <h1 className='flex justify-center text-2xl font-bold mb-4'>REVIEWS</h1>
+          <div className='justify-end flex p-5'>
+            <ReviewModal id={id}/>
+          </div>
+          <div className="flex flex-wrap gap-2 justify-center px-10">
+          {review.map((data, index) => (
+            <Card color="transparent" shadow={false} className="w-full max-w-[26rem] bg-white mb-9 p-5" key={index}>
+              <CardHeader
+                color="transparent"
+                floated={false}
+                shadow={false}
+                className="mx-0 flex items-center gap-4 pt-0 pb-8"
+              >
+                <Avatar
+                  size="lg"
+                  variant="circular"
+                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                  alt="tania andrew"
+                />
+                <div className="flex w-full flex-col gap-0.5">
+                  <div className="flex items-center justify-between">
+                    <Typography variant="h5" color="blue-gray">
+                      {data.user.name}
+                    </Typography>
+                    <div className="5 flex items-center gap-0">
+                    {Array.from({ length: data.starcount }, (_, i) => (
+                      <Star key={i} />
+                    ))}
+                    </div>
+                  </div>
+                  {/* <Typography color="blue-gray">Frontend Lead @ Google</Typography> */}
+                </div>
+              </CardHeader>
+              <CardBody className="mb-6 p-0">
+                <Typography>
+                  {data.content}
+                </Typography>
+              </CardBody>
+            </Card>
+          ))}
+
+          </div>
+        </div>
       {/* <div className="mx-auto max-w-screen-md py-12">
           <Card className="mb-12 overflow-hidden">
             <img

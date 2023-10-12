@@ -16,16 +16,15 @@ import { Profile } from '../../Components/User/Profile/Profile'
 import OrderHistory from '../../Components/User/OderHistory/OrderHistory'
 import Chat from '../../Components/User/Chat/Chat'
 
-import io from 'socket.io-client'
 import ChatList from '../../Components/User/Chat/ChatList'
+import { EditUser } from '../../Components/User/EditUser/EditUser'
 
-const socket=io.connect('http://localhost:4000')
 
 function UserRouter() {
   let routeObj={
     about:'/detailpage/:id',
     eventlist:'/eventlist/:name',
-    signup:'/eventlist/:name',
+    signup:'/signup',
     verifyemail:'/verifyemail/:id',
     eventbooking:'/eventbooking/:id',
     payment:'/payment/:id/:bookid',
@@ -35,16 +34,17 @@ function UserRouter() {
     profile:'/profile',
     login:'/login',
     chatlist:'/chatlist',
-    chat:'/chat'
+    chat:'/chat',
+    edituser:'/useredit/:id'
   }
   return (
     <Routes>
       <Route path={routeObj.login} element={ <UserPublic><LogIn /></UserPublic> } />
+      <Route path={routeObj.signup} element={<SignUp />}></Route>
       <Route  path="/" element={ <LayOut/> }>
         <Route index element={<Home />}></Route>
         <Route path={routeObj.about} element={<About />}></Route>
         <Route path={routeObj.eventlist} element={<Events />}></Route>
-        <Route path={routeObj.signup} element={<SignUp />}></Route>
         <Route path={routeObj.verifyemail} element={<EmailVerified />}></Route>
         <Route path={routeObj.eventbooking} element={<UserProtect><EventBooking /></UserProtect>} />
         <Route path={routeObj.payment} element={<Payment />}></Route>
@@ -54,6 +54,7 @@ function UserRouter() {
         <Route path={routeObj.profile} element={<UserProtect><Profile /></UserProtect>}></Route>
         <Route path={routeObj.chatlist} element={<ChatList />}></Route>
         <Route path={routeObj.chat} element={<Chat />}></Route>
+        <Route path={routeObj.edituser} element={<EditUser />}></Route>
       </Route>
     </Routes>
   )

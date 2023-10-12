@@ -136,7 +136,7 @@ function SideDrawer() {
 
   return (
     <>
-      <Box
+      {/* <Box
         d="flex"
         justifyContent="space-between"
         alignItems="center"
@@ -159,13 +159,13 @@ function SideDrawer() {
         <div>
           <Menu>
             <MenuButton p={1}>
-              {/* <NotificationBadge
+              <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
-              /> */}
+              />
               <BellIcon fontSize="2xl" m={1} />
             </MenuButton>
-            {/* <MenuList pl={2}>
+            <MenuList pl={2}>
               {!notification.length && "No New Messages"}
               {notification.map((notif) => (
                 <MenuItem
@@ -180,9 +180,9 @@ function SideDrawer() {
                     : `New Message from ${getSender(user, notif.chat.users)}`}
                 </MenuItem>
               ))}
-            </MenuList> */}
+            </MenuList>
           </Menu>
-          {/* <Menu>
+          <Menu>
             <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
               <Avatar
                 size="sm"
@@ -198,13 +198,12 @@ function SideDrawer() {
               <MenuDivider />
               <MenuItem onClick={logoutHandler}>Logout</MenuItem>
             </MenuList>
-          </Menu> */}
+          </Menu>
         </div>
-      </Box>
+      </Box> */}
 
       <>
-      {/* Replace the following JSX with your desired HTML and React components */}
-      <div>
+      <div className='p-5'>
         <label>
           Search by name or email:
           <input

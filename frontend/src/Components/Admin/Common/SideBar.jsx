@@ -47,7 +47,7 @@ export function Sidebar({ closeSidebar }) {
             </ListItemPrefix>
             Users
           </ListItem>
-          <ListItem>
+          <ListItem onClick={()=>(navigate('/admin/reportdata'),closeSidebar())}>
             <ListItemPrefix>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -62,8 +62,8 @@ export function Sidebar({ closeSidebar }) {
                 />
               </svg>
             </ListItemPrefix>
-            Inbox
-            <ListItemSuffix>
+            Reports
+            {/* <ListItemSuffix>
               <Chip
                 value="14"
                 size="sm"
@@ -71,7 +71,7 @@ export function Sidebar({ closeSidebar }) {
                 color="blue-gray"
                 className="rounded-full"
               />
-            </ListItemSuffix>
+            </ListItemSuffix> */}
           </ListItem>
           <ListItem>
             <ListItemPrefix>

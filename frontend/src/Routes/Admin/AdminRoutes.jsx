@@ -6,12 +6,16 @@ import AdminProtect from './AdminProtect'
 import LayOut from '../../Components/Admin/LayOut/LayOut'
 import UserData from '../../Components/Admin/UserData/UserData'
 import EventCategory from '../../Components/Admin/Categories/eventCategory'
+import { Report } from '../../Components/Admin/Reports/Report'
+import { Detail } from '../../Components/Admin/Reports/Detail'
 
 let routeObj={
   dashboard:'/dashboard',
   userdata:'/userdata',
   login:'/login',
   eventcategorey:'/addeventcategorey',
+  report:'/reportdata',
+  detailreport:'/reportdetails/:id',
 }
 
 function AdminRoutes() {
@@ -27,6 +31,8 @@ function AdminRoutes() {
               <Route path={routeObj.dashboard} element={ <AdminHome/> } />
               <Route path={routeObj.userdata} element={ <UserData/> } />
               <Route path={routeObj.eventcategorey} element={ <EventCategory/> } />
+              <Route path={routeObj.report} element={ <Report/> } />
+              <Route path={routeObj.detailreport} element={ <Detail/> } />
             </Route>
           </Route>
         </Routes>

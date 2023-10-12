@@ -95,7 +95,7 @@ const MyChats = ({ fetchAgain }) => {
                 key={chat._id}
               >
                 <Text>
-                  {chat.chatName}
+                  {chat.users.manager.name}
                 </Text>
                 {chat.latestMessage && (
                   <Text fontSize="xs">

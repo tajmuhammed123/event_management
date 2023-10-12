@@ -3,6 +3,7 @@ const userRouter=express.Router()
 const userController=require('../Controller/userController')
 const messageController=require('../Controller/messageController')
 const { userAuth } = require('../Middleware/authMiddleware')
+const { upload } = require('../Middleware/Multer')
 
 userRouter.post('/signup',userController.userReg)
 userRouter.post('/login',userController.userLogin)
@@ -25,5 +26,8 @@ userRouter.get('/fetchchat/:userId',userController.fetchChats)
 userRouter.get('/usersearch',userController.searchUsers)
 userRouter.post('/message',messageController.sendMessage)
 userRouter.get('/message/:chatId',messageController.allMessages)
+userRouter.post('/submitreview',userController.submitReview)
+userRouter.post('/submitreport',userController.submitReport)
+userRouter.post('/updateuserprofile',userAuth,upload.single('profile_img'),userController.updateUser)
 
 module.exports=userRouter

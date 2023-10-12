@@ -21,9 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <ThemeProvider>
             <GoogleOAuthProvider clientId="396923851681-hl0f4ckgnho40cgh46bl06emt5fhvbjd.apps.googleusercontent.com">
             <QueryClientProvider client={queryClient}>
-              <ChatProvider>
                 <App />
-              </ChatProvider>
             </QueryClientProvider>
             </GoogleOAuthProvider>
           </ThemeProvider>

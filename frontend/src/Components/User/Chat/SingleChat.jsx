@@ -9,8 +9,9 @@ import io from "socket.io-client";
 import { ChatState } from "./Components/Context/ChatProvider";
 import Lottie from "lottie-react";
 import animationData from './TypingAnimation/typing.json'
-import { axiosUserInstance } from "../../../Constants/axios";
+import { axiosManagerInstance, axiosUserInstance } from "../../../Constants/axios";
 import ScrollableChat from "./Components/ScrollableChat";
+import { Button } from "@material-tailwind/react";
 const ENDPOINT = "http://localhost:4000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
@@ -34,7 +35,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
 
-  const fetchMessages = async () => {
+  const  fetchMessages = async () => {
     if (!selectedChat) return;
 
     try {
@@ -82,7 +83,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           {
             content: newMessage,
             chatId: selectedChat,
-            userId:user.user._id
+            userId: user.user._id,
           },
           config
         );
@@ -91,7 +92,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setMessages([...messages, data]);
       } catch (error) {
         toast({
-          title: "Error Occured!",
+          title: "Error Occurred!",
           description: "Failed to send the Message",
           status: "error",
           duration: 5000,
@@ -134,7 +135,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         }
       } else {
         // Update the messages state to include the new message while preserving previous messages
-        setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+        setMessages([...messages, newMessageReceived]);
       }
     };
   
@@ -146,7 +147,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       // Unregister the event listener
       socket.off("message received", handleNewMessageReceived);
     };
-  }, [selectedChatCompare, notification, fetchAgain]);
+  }, [selectedChatCompare, notification, fetchAgain,messages]);
   
   
   
@@ -170,6 +171,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setTyping(false);
       }
     }, timerLength);
+  };
+
+  const isMessageSender = (currentUser, selectedChat) => {
+    return (
+      selectedChat.sender && currentUser.user._id === selectedChat.sender._id
+    );
   };
 
   return (
@@ -204,49 +211,38 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             overflowY="hidden"
           >
             {loading ? (
-              <Spinner
-                size="xl"
-                w={20}
-                h={20}
-                alignSelf="center"
-                margin="auto"
-              />
+              <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
             ) : (
               <div className="messages">
-                <ScrollableChat messages={messages} />
+                <ScrollableChat messages={messages} user={user} />
               </div>
             )}
-
-            <FormControl
-              onKeyDown={sendMessage}
-              id="first-name"
-              isRequired
-              mt={3}
-            >
-              {istyping ? (
-                <div>
-                  <Lottie
-                    options={defaultOptions}
-                    // height={50}
-                    width={70}
-                    style={{ marginBottom: 15, marginLeft: 0 }}
-                  />
-                </div>
-              ) : (
-                <></>
-              )}
-              <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message.."
-                value={newMessage}
-                onChange={typingHandler}
-              />
+            {istyping && !isMessageSender(user, selectedChat) ? ( // Check if sender is not the current user
+              <div>
+                <p style={{ marginBottom: 8, marginLeft: 0, color: "gray" }}>
+                  Typing...
+                </p>
+              </div>
+            ) : (
+              <></>
+            )}
+            <FormControl className="w-full pt-3" id="first-name" isRequired>
+              <div className="relative flex w-full">
+                <Input
+                  className="w-full"
+                  borderRadius={15}
+                  bg="#E0E0E0"
+                  placeholder="Enter a message..."
+                  value={newMessage}
+                  onChange={typingHandler}
+                  onKeyDown={sendMessage}
+                />
+                <Button onClick={sendMessage}>Send</Button>
+              </div>
             </FormControl>
           </Box>
         </>
       ) : (
-        // to get socket.io on same page
         <Box d="flex" alignItems="center" justifyContent="center" h="100%">
           <Text fontSize="3xl" pb={3} fontFamily="Work sans">
             Click on a user to start chatting
@@ -255,6 +251,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       )}
     </>
   );
+  
 };
 
 export default SingleChat;

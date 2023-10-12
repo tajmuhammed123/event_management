@@ -205,9 +205,8 @@ function Events() {
             </CardFooter>
           </Card>
           {data.map((card,index)=>{
-            const coverImage=`/Images/${card.eventData.cover_image}`
-            const eventlist=Object.keys(card.eventData.events)
-            .filter((key) => card.eventData.events[key] === 'true')
+            const coverImage=`${card.eventData.cover_image}`
+            const eventlist=card.eventData.events
           return(
           <Card className="w-full max-w-[17rem] h-[30rem] shadow-lg mx-5" key={index} onClick={()=>navigate(`/detailpage/${card._id}`)}>
             <CardHeader className='h-[10rem]' floated={false} color="white">
