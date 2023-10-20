@@ -4,12 +4,14 @@ const Events=require('../Models/eventsModel')
 const User=require('../Models/userModels')
 const Chat=require('../Models/chatModel')
 const Review=require('../Models/reviewModel')
+const Subscription=require('../Models/subscriptionModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
 const  Tokenmodel =require('../Models/token.js')
 const { sendEmail } = require('../utils/email')
 const { MultiUploadCloudinary, uploadToCloudinary } = require('../utils/cloudinary')
+const { default: Stripe } = require('stripe')
 
 const managerReg = async (req,res)=>{
     try{
@@ -39,15 +41,6 @@ const managerReg = async (req,res)=>{
           return res.status(200).json({ alert: 'Check your Email and Verify', status: true });
         // return res.status(200).json({ token: token,user:newUser, alert:'Registred', status: true});
     }catch(error){
-        console.log(error.message);
-    }
-}
-
-const uploadImage=async(req,res)=>{
-    try {
-        console.log('herer');
-        console.log(req.files);
-    } catch (error) {
         console.log(error.message);
     }
 }
@@ -149,11 +142,44 @@ const VerifyPassword=async(req,res)=>{
     }
 }
 
+const updateMananger=async(req,res)=>{
+    try {
+        console.log('fdgf');
+        const cloudinarydata = await uploadToCloudinary(req.file.path, "profile_img");
+        console.log(cloudinarydata);
+        
+          const mob = parseInt(req.body.mob, 10);
+        
+          console.log(req.body, 'body');
+          let data = req.body;
+        
+          await Manager.findOneAndUpdate(
+            { _id: req.body.id },
+            {
+              $set: {
+                name: data.name,
+                mob: mob,
+                profile_img: cloudinarydata.url,
+              }
+            },{upsert:true}
+          );
+          let user = await Manager.findOne(
+            { _id: req.body.id }
+          );
+          console.log(user);
+          return res.status(200).json({status:true,user:user})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const getEventData=async(req,res)=>{
     try {
+        const {id}=req.params
         const eventData=await Events.find({is_block:false})
+        const managerData=await Manager.findById(id)
         console.log(eventData);
-        return res.status(200).json({eventData})
+        return res.status(200).json({eventData,managerData})
     } catch (error) {
         
     }
@@ -216,6 +242,7 @@ const managerData=async(req,res)=>{
         const {id}=req.params
         const manager=await Manager.findById(id)
         const review=await Review.find({manager:id})
+        console.log(manager);
         return res.status(200).json({data:manager, status:true, review:review})
 
     } catch (error) {
@@ -249,9 +276,41 @@ const bookingData=async(req,res)=>{
     try {
         console.log('hjhg');
         const {id}=req.params
-        const data= await Booking.find({manager_id:id, is_paid:'paid'})
+        const data= await Booking.find({manager_id:id}).populate('user_id')
         console.log(data);
         return res.status(200).json({data:data,alert:'booking data'})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const bookingDetails=async(req,res)=>{
+    try {
+        const {id}=req.params
+        const data= await Booking.findById(id).populate('user_id')
+        console.log(data);
+        return res.status(200).json({data:data,alert:'booking data'})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const confirmBooking=async(req,res)=>{
+    try {
+        console.log('hjk');
+        const {id,amount}=req.params
+        console.log(id);
+        console.log(amount);
+        const userData=await Booking.findByIdAndUpdate(id,{$set:{is_confirmed:true,advance_amount:amount,is_paid:'pending'}},{new:true})
+        const user=await User.findById(userData.user_id)
+        const email=user.email
+        let subject='Booking Confirmation'
+        let text='<p>Congratulations' + user.name + ', Your booking has been confirmed by Manager. Please click here to <a href="http://localhost:3000/bookingpayment/' + id + '"> Pay </a> your Advance.</p>'
+        const emailres= sendEmail(email,subject,text)
+        if(emailres.error){
+            console.log('dfgd');
+            console.log(emailres);
+        }
+        res.status(200).json({status:true})
     } catch (error) {
         console.log(error.message);
     }
@@ -286,7 +345,7 @@ const fetchChats=async(req,res)=>{
         .populate('latestMessage').populate({
             path: 'latestMessage',
             populate: {
-              path: 'sender.manager',
+              path: 'sender.manager' ? 'sender.manager' : 'sender.user',
               select: '-password',
             },
           }).populate({
@@ -295,7 +354,74 @@ const fetchChats=async(req,res)=>{
               path: 'sender.user',
               select: '-password',
             },
-          }).then((result)=>{console.log(result),res.send(result)});
+          })
+          result.reverse();
+          console.log(result);
+        res.send(result)
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const handleSubscription=async(req,res)=>{
+    try {
+        const {id}=req.params
+        const exists=await Subscription.findOne({managerId:id})
+        if(exists){
+            return res.status(200).json({status:false})
+        }else{
+            return res.status(200).json({status:true})
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const subscriptionPayment=async(req,res)=>{
+    try {
+        const {method}=req.params
+        const stripe=new Stripe('sk_test_51NwHkGSEDFbx4uMAi4gaS8gIKK34IfRc6c1ang04n7KDxk5t8rRyid4fKedWCBqlaBUJeKDMczwzhCtPU1nWriaq00ahzBlJ8c')
+        let price
+        if(method=='classic'){
+            price=1000
+        }else if(method=='standard'){
+            price=3000
+        }else if(method=='premium'){
+            price=7000
+        }
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: price*100,
+            currency: "inr",
+            automatic_payment_methods: {
+              enabled: true,
+            },
+          });
+          console.log(paymentIntent);
+          res.status(200).json({
+            clientSecret: paymentIntent.client_secret,price:price})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const subscriptionSuccess=async(req,res)=>{
+    try {
+        console.log(req.body);
+        const {method,id}=req.body
+        let expire=0
+        if(method=='classic'){
+            expire=604800
+        }else if(method=='standard'){
+            expire=2592000
+        }else if(method=='premium'){
+            expire=7776000
+        }
+        const subscribe = new Subscription({
+            managerId: id,
+        });
+        console.log(expire);
+
+        subscribe.createdAt.setSeconds(subscribe.createdAt.getSeconds() + expire)
+
+        await subscribe.save();
     } catch (error) {
         console.log(error.message);
     }
@@ -303,15 +429,20 @@ const fetchChats=async(req,res)=>{
 
 module.exports={
     managerReg,
-    uploadImage,
     eventData,
     managerLogin,
     getEventData,
     forgotPassword,
     VerifyPassword,
+    updateMananger,
     managerData,
     managerVerify,
+    bookingDetails,
     bookingData,
+    confirmBooking,
     searchUsers,
-    fetchChats
+    fetchChats,
+    subscriptionPayment,
+    subscriptionSuccess,
+    handleSubscription
 }

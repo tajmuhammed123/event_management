@@ -4,6 +4,7 @@ import {
     Checkbox,
     Button,
     Typography,
+    Spinner,
   } from "@material-tailwind/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -17,8 +18,7 @@ import { axiosUserInstance } from "../../../Constants/axios";
   export function EditUser() {
     const queryClient = useQueryClient();
     const navigate=useNavigate()
-
-    
+    const [loading,setLoading]=useState(false)
     const userInfoString = localStorage.getItem("userInfo");
     
     const userInfo = JSON.parse(userInfoString)
@@ -44,9 +44,12 @@ import { axiosUserInstance } from "../../../Constants/axios";
             console.log('sub');
             console.log(formData);
             if(values){
+              setLoading(true)
                 let {data}=await updateProfile(formData)
                 console.log(data);
                 if(data.status){
+                  setLoading(false)
+                  localStorage.setItem('userInfo',JSON.stringify({user:data.user}))
                     navigate('/profile')
                     return <Updated/>
                 }
@@ -60,6 +63,11 @@ import { axiosUserInstance } from "../../../Constants/axios";
     formData.append("id", userInfo.user._id);
     formData.append("mob", values.mob);
     formData.append("profile_img", values.profile_img);
+
+    if(loading ){
+      return <div className='h-screen w-screen flex items-center justify-center'>
+        <Spinner /></div>;
+  }
     return (
     <div className="flex justify-center py-9">
       <Card color="transparent" shadow={false}>

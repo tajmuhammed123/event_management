@@ -28,6 +28,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { LogoutDetails } from '../../../actions/ManagerActions';
 import SidebarList from './SidebarList';
+import { ChatBubble } from '@mui/icons-material';
 
  
 // profile menu component
@@ -73,7 +74,6 @@ function ProfileMenu() {
       onclick: ()=>{handleLogOut()}
     },
   ];
- 
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -82,13 +82,19 @@ function ProfileMenu() {
           color="blue-gray"
           className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
         >
-          <Avatar
-            variant="circular"
-            size="sm"
-            alt="tania andrew"
-            className="border border-gray-900 p-0.5"
-            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-          />
+          {managerInfo.user.profile_img?<Avatar
+              variant="circular"
+              size="sm"
+              alt="tania andrew"
+              className="border border-gray-900 p-0.5"
+            src={managerInfo.user.profile_img}
+          />:<Avatar
+          variant="circular"
+          size="sm"
+          alt="tania andrew"
+          className="border border-gray-900 p-0.5"
+          src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+        />}
           <ChevronDownIcon
             strokeWidth={2.5}
             className={`h-3 w-3 transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
@@ -148,9 +154,9 @@ export function StickyNavbar() {
       color="blue-gray"
       className="p-1 font-normal"
     >
-      <a href="#" className="flex items-center">
-        Pages
-      </a>
+      <Button onClick={()=>(navigate('/manager/subscription'))}  className="flex items-center">
+        Subscribe
+      </Button>
     </Typography>
     <Typography
       as="li"
@@ -158,11 +164,9 @@ export function StickyNavbar() {
       color="blue-gray"
       className="p-1 font-normal"
     >
-      <a href="#" className="flex items-center">
-        Account
-      </a>
+      <ChatBubble style={{ fontSize: '45px' }} onClick={()=>navigate('/manager/chat')}/>
     </Typography>
-    <Typography
+    {/* <Typography
       as="li"
       variant="small"
       color="blue-gray"
@@ -181,7 +185,7 @@ export function StickyNavbar() {
       <a href="#" className="flex items-center">
         Docs
       </a>
-    </Typography>
+    </Typography> */}
     </ul>
   );
   const [open, setOpen] = React.useState(false);

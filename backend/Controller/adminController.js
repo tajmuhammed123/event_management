@@ -2,6 +2,7 @@ const User=require('../Models/userModels')
 const Manager=require('../Models/managerModel')
 const Payment=require('../Models/transactionModel')
 const Report=require('../Models/reportModel')
+const Banner=require('../Models/bannerModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -46,7 +47,14 @@ const adminLogin = async (req, res) => {
 
 const managerData=async(req,res)=>{
     try {
-        const data=await Manager.find({eventData: { $exists: true, $ne: null }})
+        const {num}=req.params
+        console.log(num);
+        let start=(num-1)*2
+        let limit=start+2
+        const data=await Manager
+        .find({ eventData: { $exists: true, $ne: null } })
+        .skip(start)
+        .limit(limit);
         return res.status(200).json({data:data,status:true})
     } catch (error) {
         console.log(error.message);
@@ -141,6 +149,59 @@ const reportDetail=async(req,res)=>{
     }
 }
 
+const addBanner=async(req,res)=>{
+    try {
+        console.log('dffd');
+        const cloudinarydata = await uploadToCloudinary(req.file.path, "banner_img");
+        console.log(req.body);
+        const {banner_text,
+            main_text,
+            button_text}=req.body
+            console.log(banner_text);
+            if(req.body.id){
+                const banner=await Banner.findByIdAndUpdate(req.body.id,{$set:{banner_text,
+                    main_text,
+                    button_text,
+                    banner_img:cloudinarydata.url}})
+                    return res.status(200).json({banner})
+            }else{
+
+                const banner=await new Banner({
+                    banner_text,
+                    main_text,
+                    button_text,
+                    banner_img:cloudinarydata.url
+                }).save()
+                return res.status(200).json({banner})
+            }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const bannerData=async(req,res)=>{
+    try {
+        console.log('noh');
+        let banner=await Banner.find({})
+        console.log(banner);
+        return res.status(200).json({banner})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+const singleBanner=async(req,res)=>{
+    try {
+        console.log('fds');
+        const {id}=req.params
+        console.log(id);
+        let banner=await Banner.findById(id)
+        console.log(banner);
+        return res.status(200).json({banner})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 module.exports={
     adminLogin,
     managerData,
@@ -151,5 +212,8 @@ module.exports={
     managerReject,
     addEvent,
     reportData,
-    reportDetail
+    reportDetail,
+    bannerData,
+    singleBanner,
+    addBanner
 }

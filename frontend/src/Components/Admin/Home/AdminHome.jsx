@@ -83,28 +83,41 @@ function AdminHome() {
   // useEffect(()=>{
   //   ManagerData()
   // },[isLoading])
-  const { isLoading:isLoading2, error:error2 } = useQuery({
-    queryKey: ['manager'],
-    queryFn: async () => {
-      try {
-        const userData=localStorage.getItem('adminInfo')
-  const userInfo=JSON.parse(userData)
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userInfo.token.token}`,
-    },
-  };
-        const response = await axiosAdminInstance.get('/getmanagerdata',config).then((res)=>{setData(res.data.data),console.log(res.data.data)}).catch((err)=>console.log(err.message))
-        setData(response.data.data);
-        console.log(response.data.data);
-      } catch (err) {
-        console.error(err.message);
-      }
-    },
-  });
 
-  if(isLoading2 ){
+  const handleData=async(num)=>{
+    try {
+      console.log(num);
+      fetchData(num)
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  const fetchData = async (num) => {
+    const userData = localStorage.getItem('adminInfo');
+    const userInfo = JSON.parse(userData);
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token.token}`,
+      },
+    };
+  
+    try {
+      const response = await axiosAdminInstance.get(`/getmanagerdata/${num}`, config);
+      setData(response.data.data);
+      console.log(response.data.data);
+      return response.data.data;
+    } catch (err) {
+      console.error(err.message);
+      throw err;
+    }
+  };
+  
+  const { isLoading, error, data } = useQuery(['manager'], () => fetchData(1));
+  
+
+  if(isLoading ){
       return <div className='h-screen w-screen flex items-center justify-center'>
         <Spinner /></div>;
   }
@@ -282,16 +295,16 @@ function AdminHome() {
           Previous
         </Button>
         <div className="flex items-center gap-2">
-          <IconButton variant="outlined" size="sm">
+          <IconButton variant="outlined" size="sm" value={1} onClick={(e)=>handleData(e.target.value)}>
             1
           </IconButton>
-          <IconButton variant="text" size="sm">
+          <IconButton variant="text" size="sm" value={2} onClick={(e)=>handleData(e.target.value)}>
             2
           </IconButton>
-          <IconButton variant="text" size="sm">
+          <IconButton variant="text" size="sm" value={3} onClick={(e)=>handleData(e.target.value)}>
             3
           </IconButton>
-          <IconButton variant="text" size="sm">
+          <IconButton variant="text" size="sm" >
             ...
           </IconButton>
           <IconButton variant="text" size="sm">

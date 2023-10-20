@@ -12,6 +12,7 @@ import animationData from './TypingAnimation/typing.json'
 import { axiosManagerInstance, axiosUserInstance } from "../../../Constants/axios";
 import ScrollableChat from "./Components/ScrollableChat";
 import { Button } from "@material-tailwind/react";
+import { toast } from "react-toastify";
 const ENDPOINT = "http://localhost:4000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
@@ -22,7 +23,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
-  const toast = useToast();
+
+  const GenerateError = (err) => {
+    toast.error(err, {
+      position: 'top-center',
+      theme: 'colored',
+      autoClose: 3000
+    });
+  };
 
   const defaultOptions = {
     loop: true,
@@ -56,14 +64,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Messages",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+      GenerateError("Error Occured!,Failed to Load the Messages");
     }
   };
 
@@ -91,14 +92,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
-        toast({
-          title: "Error Occurred!",
-          description: "Failed to send the Message",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
+        GenerateError("Error Occured!,Failed to Load the Messages");
       }
     }
   };
@@ -203,6 +197,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             d="flex"
             flexDir="column"
             justifyContent="flex-end"
+            className="flex flex-end flex-col"
             p={3}
             bg="#E8E8E8"
             w="100%"

@@ -254,7 +254,46 @@ export const updateProfile= async(values)=>{
         Authorization: `Bearer ${userInfo.token.token}`,
       },
     }
-      const data=await axiosManagerInstance.post('/updatemanagerprofile',values,config)
+      const data=await axiosManagerInstance.patch('/updatemanagerprofile',values,config)
+      console.log(data);
+      return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
+export const subsciptionPayment= async(method)=>{
+  try {
+    const userData=localStorage.getItem('managerInfo')
+    const userInfo=JSON.parse(userData)
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userInfo.token.token}`,
+      },
+    }
+      const data=await axiosManagerInstance.get(`/subscriptionpayment/${method}`,config)
+      console.log(data);
+      return data
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+export const subscriptionSuccess= async(method)=>{
+  try {
+    const userData=localStorage.getItem('managerInfo')
+    const userInfo=JSON.parse(userData)
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token.token}`,
+      },
+    }
+    let values={
+      method:method,
+      id:userInfo.user._id
+    }
+      const data=await axiosManagerInstance.post('/subscriptionsuccess',values,config)
       console.log(data);
       return data
   } catch (error) {

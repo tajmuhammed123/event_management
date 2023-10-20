@@ -73,7 +73,7 @@ export function Sidebar({ closeSidebar }) {
               />
             </ListItemSuffix> */}
           </ListItem>
-          <ListItem>
+          <ListItem onClick={()=>(navigate('/admin/bannerlist'),closeSidebar())}>
             <ListItemPrefix>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ export function Sidebar({ closeSidebar }) {
                 />
               </svg>
             </ListItemPrefix>
-            Profile
+            Banners
           </ListItem>
           <ListItem>
             <ListItemPrefix>

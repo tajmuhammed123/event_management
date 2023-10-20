@@ -53,6 +53,10 @@ const managerSchema=new mongoose.Schema({
         type:String,
         required:true
     },
+    profile_img:{
+        type:String,
+        required:true
+    },
     password:{
         type:String,
         required:true
@@ -68,6 +72,9 @@ const managerSchema=new mongoose.Schema({
     wallet_amount:{
         type:Number,
         default:0
+    },
+    booked_dates:{
+        type:Array,
     },
     eventData:{type:evetDataSchema}
 })

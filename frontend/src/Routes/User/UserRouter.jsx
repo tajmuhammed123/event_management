@@ -9,8 +9,7 @@ import EmailVerified from '../../Components/User/Common/EmailVerified'
 import EventBooking from '../../Components/User/Events/EventBooking'
 import UserProtect from './UserProtect'
 import LayOut from '../../Components/User/LayOut/LayOut'
-import Payment from '../../Components/User/Payment/Payment'
-import Success from '../../Components/User/Payment/Success'
+import Success from '../../Components/User/Events/Payment/Success'
 import { Cancel } from '@mui/icons-material'
 import { Profile } from '../../Components/User/Profile/Profile'
 import OrderHistory from '../../Components/User/OderHistory/OrderHistory'
@@ -18,6 +17,9 @@ import Chat from '../../Components/User/Chat/Chat'
 
 import ChatList from '../../Components/User/Chat/ChatList'
 import { EditUser } from '../../Components/User/EditUser/EditUser'
+import PaymentBooking from '../../Components/User/Payment/PaymentBooking'
+import PaymentSuccess from '../../Components/User/Payment/PaymentSuccess'
+import Payment from '../../Components/User/Events/Payment/Payment'
 
 
 function UserRouter() {
@@ -27,7 +29,7 @@ function UserRouter() {
     signup:'/signup',
     verifyemail:'/verifyemail/:id',
     eventbooking:'/eventbooking/:id',
-    payment:'/payment/:id/:bookid',
+    payment:'/payment',
     success:'/success',
     cancel:'/cancel',
     orderhistory:'/orderhistory',
@@ -35,7 +37,9 @@ function UserRouter() {
     login:'/login',
     chatlist:'/chatlist',
     chat:'/chat',
-    edituser:'/useredit/:id'
+    edituser:'/useredit/:id',
+    bookingpayment:'/bookingpayment/:id',
+    bookingsuccess:'/bookingsuccess',
   }
   return (
     <Routes>
@@ -47,7 +51,6 @@ function UserRouter() {
         <Route path={routeObj.eventlist} element={<Events />}></Route>
         <Route path={routeObj.verifyemail} element={<EmailVerified />}></Route>
         <Route path={routeObj.eventbooking} element={<UserProtect><EventBooking /></UserProtect>} />
-        <Route path={routeObj.payment} element={<Payment />}></Route>
         <Route path={routeObj.success} element={<Success />}></Route>
         <Route path={routeObj.cancel} element={<Cancel />}></Route>
         <Route path={routeObj.orderhistory} element={<OrderHistory />}></Route>
@@ -55,6 +58,9 @@ function UserRouter() {
         <Route path={routeObj.chatlist} element={<ChatList />}></Route>
         <Route path={routeObj.chat} element={<Chat />}></Route>
         <Route path={routeObj.edituser} element={<EditUser />}></Route>
+        <Route path={routeObj.bookingpayment} element={<PaymentBooking />}></Route>
+        <Route path={routeObj.payment} element={<Payment />}></Route>
+        <Route path={routeObj.bookingsuccess} element={<PaymentSuccess />}></Route>
       </Route>
     </Routes>
   )

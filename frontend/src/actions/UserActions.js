@@ -255,6 +255,7 @@ export const LogoutDetails = ()=> async (dispatch)=>{
 export const EventSubmit = async(eventdata)=>
 {
   try {
+    console.log(eventdata);
     const userData=localStorage.getItem('userInfo')
     const userInfo=JSON.parse(userData)
     const config = {
@@ -283,7 +284,7 @@ export const userPayment= async(id)=>{
           },
         };
         const data  = await axiosUserInstance.post(
-          `/payment/${id}`,
+          '/payment',
           config
         );
         console.log(data);
@@ -292,7 +293,7 @@ export const userPayment= async(id)=>{
       console.log(error.message);
   }
 }
-export const paymentSuccess= async(id,mangId)=>{
+export const paymentSuccess= async(id)=>{
   try {
     const userData=localStorage.getItem('userInfo')
     const userInfo=JSON.parse(userData)
@@ -303,7 +304,7 @@ export const paymentSuccess= async(id,mangId)=>{
           },
         };
         const { data } = await axiosUserInstance.post(
-          `/paymentsuccess/${id}/${mangId}`,
+          `/paymentsuccess/${id}`,
           config
         );
         return data

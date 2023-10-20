@@ -7,13 +7,20 @@ import ChatLoading from "./ChatLoading";
 import { Button } from "@chakra-ui/react";
 import { axiosManagerInstance } from "../../../../Constants/axios";
 import { ChatState } from "./Context/ChatProvider";
+import { toast } from "react-toastify";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
 
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
-  const toast = useToast();
+  const GenerateError = (err) => {
+    toast.error(err, {
+      position: 'top-center',
+      theme: 'colored',
+      autoClose: 3000
+    });
+  };
 
   const fetchChats = async () => {
     // console.log(user._id);
@@ -30,14 +37,7 @@ const MyChats = ({ fetchAgain }) => {
       console.log(data);
       setChats(data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the chats",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
+      GenerateError("Error Occured!,Failed to Load the Messages");
     }
   };
   
@@ -95,7 +95,7 @@ const MyChats = ({ fetchAgain }) => {
                 key={chat._id}
               >
                 <Text>
-                  {chat.chatName}
+                  {chat&&chat.users.user.name}
                 </Text>
                 {chat.latestMessage && (
                   <Text fontSize="xs">

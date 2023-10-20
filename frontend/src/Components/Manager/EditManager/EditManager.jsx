@@ -9,9 +9,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { ProfileUpdate } from "../../../Validation/validation";
-import { updateProfile } from "../../../actions/UserActions";
 import { Updated } from "./Updated";
 import { useNavigate } from "react-router-dom";
+import { updateProfile } from "../../../actions/ManagerActions";
    
   export function EditManager() {
     const queryClient = useQueryClient();
@@ -46,6 +46,7 @@ import { useNavigate } from "react-router-dom";
                 let {data}=await updateProfile(formData)
                 console.log(data);
                 if(data.status){
+                  localStorage.setItem('managerInfo',JSON.stringify({user:data.user}))
                     navigate('/manager/profile')
                     return <Updated/>
                 }

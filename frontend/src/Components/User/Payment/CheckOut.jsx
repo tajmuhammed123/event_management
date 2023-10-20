@@ -1,9 +1,11 @@
+import { Typography } from '@material-tailwind/react'
 import { LinkAuthenticationElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { EventSubmit, paymentSuccess } from '../../../actions/UserActions'
+import { subscriptionSuccess } from '../../../actions/ManagerActions'
+import { axiosUserInstance } from '../../../Constants/axios'
 
-function CehckOut({Secret,bookid,mangId}) {
+function CehckOut({id,price}) {
     const stripe=useStripe()
     const elements=useElements()
     // const [clientSecret,setClientSecret]=useState(Secret)
@@ -51,13 +53,15 @@ function CehckOut({Secret,bookid,mangId}) {
           const {error, paymentIntent}= await stripe.confirmPayment({
               elements,
               confirmParams:{
-                  return_url:'http://localhost:3000/success'
+                  return_url:'http://localhost:3000/bookingsuccess'
               },
               redirect:'if_required'
           })
           if(paymentIntent){
-              paymentSuccess(bookid,mangId)
-              navigate('/success')
+              const res=await axiosUserInstance.get(`/bookingpaymentsuccess/${id}`)
+              if(res.data.status){
+                navigate('/bookingsuccess')
+              }
           }
   
           if(error.type==='card_error'|| error.type==='validation_error'){
@@ -84,13 +88,19 @@ function CehckOut({Secret,bookid,mangId}) {
           <h1 className="text-4xl font-extrabold">Secure Payment</h1>
           <p className="mt-2">Fast, Easy, and Secure</p>
         </header>
-
         <main className="flex-grow flex items-center justify-center px-4">
+
           <form
             id="payment-form"
             onSubmit={handleSubmit}
             className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md mx-auto"
           >
+                    <div className='flex justify-center'>
+          <div className='flex justify-between w-96'>
+            <Typography variant='h3' className='uppercase'>Advance</Typography>
+            <Typography variant='h3'>{price}</Typography>
+          </div>
+        </div>
             <LinkAuthenticationElement
               id="link-authentication-element"
               onChange={(e) => setEmail(e.target.value)}

@@ -41,7 +41,6 @@ const transactionSchema = new Schema({
     paidAt: {
         type: Date,
         default: Date.now(),
-        expires: 3600,
     },
 });
 

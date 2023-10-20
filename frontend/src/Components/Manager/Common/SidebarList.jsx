@@ -48,7 +48,7 @@ export function SidebarList({ closeSidebar }) {
             </ListItemPrefix>
             Bookings
           </ListItem>
-          <ListItem>
+          <ListItem onClick={()=>(navigate('/manager/subscription'),closeSidebar())}>
             <ListItemPrefix>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -63,8 +63,8 @@ export function SidebarList({ closeSidebar }) {
                 />
               </svg>
             </ListItemPrefix>
-            Inbox
-            <ListItemSuffix>
+            Subscribe
+            {/* <ListItemSuffix>
               <Chip
                 value="14"
                 size="sm"
@@ -72,7 +72,7 @@ export function SidebarList({ closeSidebar }) {
                 color="blue-gray"
                 className="rounded-full"
               />
-            </ListItemSuffix>
+            </ListItemSuffix> */}
           </ListItem>
           <ListItem>
             <ListItemPrefix>

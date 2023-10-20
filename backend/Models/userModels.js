@@ -36,6 +36,10 @@ const userSchema=new mongoose.Schema({
     wallet_amount:{
         type:Number,
         default:0
+    },
+    is_paid:{
+        type:Boolean,
+        default:false
     }
 })
 

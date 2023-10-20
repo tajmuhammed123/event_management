@@ -41,13 +41,27 @@ export function ReviewModal({id}) {
         const userId=user.user._id
         console.log(id);
         const managId=id
-        const {data}=await axiosUserInstance.post('/submitreview',{content,rating,managId,userId})
-        console.log(data);
-        if(data.message){
-            handleOpen()
-            toast(data.message)
-        }else if(data.status){
-            handleOpen()
+        if(!content){
+          toast('Content Cannot be null')
+        }else if(rating==0){
+          toast('Add rating')
+        }else{
+          const userData=localStorage.getItem('userInfo')
+          const userInfo=JSON.parse(userData)
+              const config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${userInfo.token.token}`,
+                },
+              };
+          const {data}=await axiosUserInstance.post('/submitreview',{content,rating,managId,userId},config)
+          console.log(data);
+          if(data.message){
+              handleOpen()
+              toast(data.message)
+          }else if(data.status){
+              handleOpen()
+          }
         }
         console.log(rating,'rslt');
     } catch (error) {

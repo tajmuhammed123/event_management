@@ -37,13 +37,19 @@ import { useNavigate } from "react-router-dom";
           <div className="flex justify-end">
             <EditIcon onClick={()=>navigate(`/useredit/${userInfo.user._id}`)}/>
           </div>
-          <Avatar
+          {userInfo.user.profile_img?<Avatar
+            size="lg"
+            variant="circular"
+            src={userInfo.user.profile_img}
+            alt="tania andrew"
+            className="mb-2"
+          />:<Avatar
             size="lg"
             variant="circular"
             src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
             alt="tania andrew"
             className="mb-2"
-          />
+          />}
         </div>
         <div className="flex w-full flex-col gap-0.5">
           

@@ -114,3 +114,21 @@ export const adminLogin= (email, password)=>async(dispatch)=>{
       console.log(error.message);
     }
   }
+  export const addBanner = async(values)=>{
+    try{
+      console.log(values);
+      const userData=localStorage.getItem('adminInfo')
+      const userInfo=JSON.parse(userData)
+      const config={
+        headers:{
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${userInfo.token.token}`,
+        }
+      }
+      console.log('hgj');
+      const {data}=await axiosAdminInstance.post('/addbanner',values,config)
+      return data
+    }catch(error){
+      console.log(error.message);
+    }
+  }

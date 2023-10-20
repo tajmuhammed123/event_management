@@ -38,7 +38,7 @@ function Home() {
     console.log(manager);
     const eventlist = userdata.events
     console.log(userdata);
-  },[userdata])
+  },[userdata,manager])
 
   const { isLoading, error } = useQuery({
     queryKey: ['managerdata'],
@@ -53,6 +53,7 @@ function Home() {
           },
         };
         const response = await axiosManagerInstance.get(`/managerdata/${manager.user._id}`,config);
+        console.log(response);
         console.log(response.data.review);
         setUserdata(response.data.data.eventData);
         setEventlist(response.data.data.eventData.events)
@@ -70,16 +71,6 @@ function Home() {
 
   const navigate=useNavigate()
 
-  const handleChat=async()=>{
-    
-    try {
-      navigate('/manager/chat')
-    } catch (error) {
-      console.log(error.message);
-    }
-  
-  }
-
   return (
         <div>
           <div className='background-container flex justify-center align-middle' style={{ backgroundImage: `url(${coverImage})` }}>
@@ -90,7 +81,6 @@ function Home() {
           </div>
           <div className='m-5 w-full justify-between'>
             <Button onClick={()=>navigate('/manager/eventdata')}>Add Event Datas</Button>
-            <ChatBubble style={{ fontSize: '45px' }} onClick={handleChat}/>
           </div>
     <div  className='flex align-middle justify-center w-100 mt-10'>
           <Card color="gray" variant="gradient" className="w-full max-w-[25rem] p-5 flex justify-center">

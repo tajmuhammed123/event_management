@@ -1,4 +1,4 @@
-import { useState} from 'react';
+import { useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useDispatch,useSelector} from 'react-redux'
 import { ToastContainer, toast } from 'react-toastify';
@@ -62,10 +62,10 @@ function LogIn() {
             }else if(!password){
               GenerateError('Password cannot be null')
             }else{
-              setLoading(true); // Show the spinner
+              setLoading(true);
               console.log(loading);
               const response= await dispatch(userLogin(email,password))
-              setLoading(false); // Hide the spinner when the response is received
+              setLoading(false);
                 console.log(response);
                 if(response.response){
                   toast(response.response.data.alert)
@@ -99,33 +99,40 @@ function LogIn() {
     const login = useGoogleLogin({
       onSuccess: (codeResponse) => {
         setUser(codeResponse)
-        GoogleAuth()
+        // GoogleAuth()
       },
       onError: (error) => console.log('Login Failed:', error),
   })
 
-  const GoogleAuth=async()=>{
-    try {
+  useEffect(() => {
+    const fetchUserData = async () => {
       if (user) {
-        const res = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                headers: {
-                    Authorization: `Bearer ${user.access_token}`,
-                    Accept: 'application/json'
-                }
-            })
-            console.log(res.data);
-        const result=await dispatch(userGoogleLogin(res.data))
-        console.log(result);
-        if(result.status){
-          localStorage.setItem('token',result.token)
-            navigate('/')
+        try {
+          const response = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: 'application/json'
+            }
+          });
+  
+          console.log(response.data);
+  
+          // Assuming dispatch is asynchronous, you may want to wait for the result.
+          const result = await dispatch(userGoogleLogin(response.data));
+  
+          if (result.status) {
+            localStorage.setItem('token', result.token);
+            navigate('/');
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
-        console.log(result);
-    }
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+      }
+    };
+  
+    fetchUserData();
+  }, [user]);
+  
 
 
   return (
@@ -160,7 +167,7 @@ function LogIn() {
             </Button>
           </form>:<form className="mt-8 mb-2 w-full max-w-[48rem] sm:w-[24rem]" onSubmit={handleOtp}>
             <div className="mb-4 flex flex-col gap-6">
-              <Input size="lg" name='email' value={value.email} onChange={(e) => setValue({...value,[e.target.name]:e.target.value})} label="Email" />
+              <Input size="lg" name='email' type='email' value={value.email} onChange={(e) => setValue({...value,[e.target.name]:e.target.value})} label="Email" />
             </div>
             <Button className="mt-6" fullWidth type='submit'>
               Get OTP

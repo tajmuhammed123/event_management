@@ -14,10 +14,10 @@ import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { axiosUserInstance } from '../../../Constants/axios';
 import { EventSubmit } from '../../../actions/UserActions';
-import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import moment from 'moment'
-import Payment from '../Payment/Payment';
+import Payment from './Payment/Payment';
+import Calendar from 'react-calendar';
 
 function Icon() {
     return (
@@ -39,15 +39,18 @@ function Icon() {
 function EventBooking() {
     const {id}=useParams()
     const [data,setData]=useState([])
+    const [excludedDates,setExcludedDates]=useState([])
     const fetchData = async () => {
       try {
         await axiosUserInstance.get(`/managerdata/${id}`).then((res)=>setData(res.data.data)).catch((err)=>console.log(err.message));
+        setExcludedDates(data.booked_dates)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
     useEffect(() => {
         fetchData()
+        
         console.log('heyy');
       },[]);
 
@@ -69,14 +72,14 @@ function EventBooking() {
       event:'',
       preffered_dishes: '',
       address:'',
-      date: new Date(),
+      date: [],
       time: '',
       additional_data: '',
     });
     const eventArray=[]
     for(const key in eventsdata){
         if(data.eventData.events){
-            eventArray.push(key)
+            eventArray.push(eventsdata[key])
         }
     }
     console.log(eventArray);
@@ -87,29 +90,43 @@ function EventBooking() {
             console.log(eventdata);
             const response= await EventSubmit(eventdata)
             console.log(response);
-            if (response.status) {
-              let bookid=response.data._id
-
-              navigate(`/payment/${id}/${bookid}`);
+            if (response.user.is_paid) {
+              navigate('/success');
             } else {
-              navigate('/eventbooking');
+              navigate(`/payment`);
             }
       }
+      const currentDate = new Date();
+      console.log(excludedDates);
+    const tileDisabled = ({ date }) => {
+      return excludedDates.some(excludedDate =>
+        moment(excludedDate).isSame(date, 'day')
+      );
+    }
 
-      const excludedDates = [
-        new Date('2023-08-15'),
-        new Date('2023-08-20'),
-      ];
-      const tileDisabled = ({ date }) => {
-        return excludedDates.some(excludedDate =>
-          moment(excludedDate).isSame(date, 'day')
-        );
-      }
+    const changeDate = (e) => {
+      const selectedDate = e;
+      const dateIndex = eventdata.date.findIndex((date) =>
+        moment(date).isSame(selectedDate, 'day')
+      );
     
-      const changeDate = (e) => {
-        const selectedDate = e;
-        setEventData({ ...eventdata, date: selectedDate });
-      };
+      if (dateIndex === -1) {
+        // Date is not in the array, so add it
+        setEventData((prevEventData) => ({
+          ...prevEventData,
+          date: [...prevEventData.date, selectedDate],
+        }));
+      } else {
+        // Date is in the array, so remove it
+        setEventData((prevEventData) => ({
+          ...prevEventData,
+          date: prevEventData.date.filter((date) =>
+            !moment(date).isSame(selectedDate, 'day')
+          ),
+        }));
+      }
+    };    
+    
 
   return (
     <div className=''>
@@ -146,31 +163,62 @@ function EventBooking() {
                     <Typography color="blue-gray" className="font-normal">
                         {data}
                     </Typography>
-                    }
+                    } required
                 />))}
             </div>
             </div>
                 <div className='flex flex-row gap-2 justify-center'>
                 <Calendar
-        value={eventdata.date}
-        onChange={changeDate}
-        tileDisabled={tileDisabled}
-      />
-      <p>Current selected date is <b>{moment(eventdata.date).format('MMMM Do YYYY')}</b></p>
+                  value={eventdata.date}
+                  onChange={changeDate}
+                  tileDisabled={tileDisabled}
+                  minDate={currentDate}
+                  tileContent={({ date, view }) => {
+                    if (view === 'month' && eventdata.date.some(selectedDate => moment(selectedDate).isSame(date, 'day'))) {
+                      // Apply inline styles to selected dates
+                      return (
+                        <div
+                          style={{
+                            backgroundColor: '#3498db', // Replace with the desired background color
+                            color: '#ffffff', // Replace with the desired text color
+                            borderRadius: '50%',
+                            padding: '5px',
+                          }}
+                        >
+                        </div>
+                      );
+                    }
+                  }}
+                />
 
-      {/* Include other form fields here */}
-      {/* Example input for the selected date */}
-      <input
-        type="hidden"
-        name="date"
-        value={moment(eventdata.date).format('YYYY-MM-DD')}
-      />
-            <Input size="lg" label="Time" name='time' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} required />
-          </div>
+                {/* <p>Current selected dates are:</p>
+                <ul>
+                  {eventdata.date.map((selectedDate, index) => (
+                    <li key={index}>{moment(selectedDate).format('MMMM Do YYYY')}</li>
+                  ))}
+                </ul> */}
+                {/* Include other form fields here */}
+                {/* Example input for the selected date */}
+                <input
+                  type="hidden"
+                  name="date"
+                  value={eventdata.date.map((date) => moment(date).format('YYYY-MM-DD')).join(',')}
+                />
+                <Input size="lg" label="Time" name="time" onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} required />
+              </div>
+              <p>Selected dates: </p>
+              <div className='flex flex-row'>
+                {eventdata.date.map((selectedDate, index) => (
+                    <p key={index}>
+                      {index + 1}:{' '}
+                      <b>{moment(selectedDate).format('MMMM Do YYYY')}</b>
+                    </p>
+                  ))}
+              </div>
             <Textarea size="lg" label="Additional Details" name='additional_data' onChange={(e)=>setEventData({...eventdata,[e.target.name]:e.target.value})} />
           </div>
           <Button className="mt-6" fullWidth type='submit'>
-            Make your Advance Payment
+            Book Slot
           </Button>
         </form>
         </Card>

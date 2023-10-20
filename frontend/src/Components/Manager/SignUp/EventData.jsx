@@ -43,14 +43,19 @@ function EventData() {
     // };
 
     const [data,setEventdata]=useState([])
+    const userInfoString = localStorage.getItem("managerInfo");
+    
+    const userInfo = JSON.parse(userInfoString)
     
     const [img,setImg]=useState([])
+    const [managerData,setManagerData]=useState([])
     const { isLoading, error, } = useQuery({
         queryKey: ['eventdata'],
         queryFn: async () => {
           try {
-            const response = await axiosManagerInstance.get('/geteventdata').then((res)=>setEventdata(res.data.eventData))
-            console.log(response);
+            const response = await axiosManagerInstance.get(`/geteventdata/${userInfo.user._id}`).then((res)=>{setEventdata(res.data.eventData),setManagerData(res.data.managerData.eventData)})
+            console.log(managerData);
+            console.log(response.data.managerData);
             console.log(response.data.eventData);
           } catch (err) {
             console.error(err.message);
@@ -168,12 +173,12 @@ function EventData() {
         <div className="mb-4 flex flex-col gap-6">
             <div className='flex flex-col lg:flex-row gap-2 justify-center'>
             <div className='flex flex-col lg:flex-row gap-2'>
-                <Input size="lg" label="Name" name='team_name' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
-                <Input size="lg" label="Salutation" name='salutation' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+                <Input size="lg" label="Name" name='team_name' value={managerData.team_name} onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+                <Input size="lg" label="Salutation" name='salutation' value={managerData.salutation} onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
             </div>
-            <Input size="lg" type='number' label="Advance Amount" name='advance_amount' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            <Input size="lg" type='number' label="Advance Amount" value={managerData.advance_amount} name='advance_amount' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
             </div>
-            <Textarea size="lg" label="About" name='about' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            <Textarea size="lg" label="About" name='about' value={managerData.about} onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
             <div className='flex flex-wrap w-20'>
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Add cover image</label>
             <input name='cover_image' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.files[0] }, console.log(e.target.files[0]))} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file"></input>
@@ -199,26 +204,28 @@ function EventData() {
             </div>
             <div className='flex flex-wrap w-full'>
             {data.map((item, index) => (
-                <Checkbox
-                key={index}
-                name={item.event_name}
-                onChange={(e) => handleEvents(e.target.name)}
-                label={
-                    <Typography
-                    variant="small"
-                    color="gray"
-                    className="flex items-center mr-5 font-normal"
-                    >
-                    {item.event_name}
-                    </Typography>
-                }
-                containerProps={{ className: "-ml-2.5" }}
-                />
-            ))}
+    <Checkbox
+        key={index}
+        name={item.event_name}
+        onChange={(e) => handleEvents(e.target.name)}
+        checked={managerData.events.includes(item.event_name)}
+        label={
+            <Typography
+                variant="small"
+                color="gray"
+                className="flex items-center mr-5 font-normal"
+            >
+                {item.event_name}
+            </Typography>
+        }
+        containerProps={{ className: "-ml-2.5" }}
+    />
+))}
+
             </div>
             <div className='flex flex-col lg:flex-row gap-2 justify-center'>
-            <Input size="lg" label="Available Dishes" name='dishes' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
-            <Input size="lg" label="Available Locations" name='location' onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            <Input size="lg" label="Available Dishes" name='dishes' value={managerData.dishes} onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
+            <Input size="lg" label="Available Locations" name='location' value={managerData.location} onChange={(e) => setEventData({ ...eventdata, [e.target.name]: e.target.value })} />
             </div>
         </div>
         <Button className="mt-6" fullWidth type='submit'>

@@ -47,13 +47,16 @@ function EventCategory() {
         console.log(pair[0], pair[1]);
       }
   return (
-    <>
-        <Card color="transparent" shadow={false}>
-      <Typography variant="h4" color="blue-gray">
-        Sign Up
+    <div className="flex justify-center pt-5">
+      <div className="flex-col">
+
+      <Typography variant="h3" color="black" className="uppercase flex justify-center pb-5">
+        Add Categorey
       </Typography>
-      <Typography color="gray" className="mt-1 font-normal">
-        Enter your details to register.
+      
+        <Card color="transparent" shadow={false}>
+      <Typography color="gray" className="mt-1 font-normal flex justify-center">
+        Enter your Categorey details to add.
       </Typography>
       <form onSubmit={handleSubmit} className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
         <div className="mb-4 flex flex-col gap-6">
@@ -94,17 +97,12 @@ function EventCategory() {
           )}
         </div>
         <Button className="mt-6" fullWidth type="submit">
-          Register
+          Add Categorey
         </Button>
-        <Typography color="gray" className="mt-4 text-center font-normal">
-          Already have an account?{" "}
-          <a href="#" className="font-medium text-gray-900">
-            Sign In
-          </a>
-        </Typography>
       </form>
     </Card>
-    </>
+    </div>
+    </div>
   )
 }
 

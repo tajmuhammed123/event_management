@@ -13,6 +13,8 @@ export function Profile() {
   const {manager}=useSelector(state=>state.managerInfo)
   console.log(manager);
   const navigate=useNavigate()
+  const managerData=localStorage.getItem('managerInfo')
+  const managerInfo=JSON.parse(managerData)
   return (
       <>
   <div className="flex mt-8 align-middle items-center h-screen flex-col">
@@ -29,15 +31,21 @@ export function Profile() {
         className="p-4 rounded-none"
       >
         <div className="flex justify-end">
-            <EditIcon onClick={()=>navigate(`/manageredit/${manager.user._id}`)}/>
+            <EditIcon onClick={()=>navigate(`/manager/manageredit/${manager.user._id}`)}/>
           </div>
-      <Avatar
-        size="lg"
-        variant="circular"
-        src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-        alt="tania andrew"
-        className="mb-2"
-      />
+          {managerInfo.user.profile_img?<Avatar
+            size="lg"
+            variant="circular"
+            src={managerInfo.user.profile_img}
+            alt="tania andrew"
+            className="mb-2"
+          />:<Avatar
+            size="lg"
+            variant="circular"
+            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+            alt="tania andrew"
+            className="mb-2"
+          />}
       <div className="flex w-full flex-col gap-0.5">
         <div className="flex items-center justify-between">
           <Typography variant="h4" color="blue-gray">

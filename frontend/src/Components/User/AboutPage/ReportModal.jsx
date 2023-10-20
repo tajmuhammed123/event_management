@@ -23,11 +23,23 @@ export function ReportModal({id}) {
         console.log(user);
         const userId=user.user._id
         const managId=id
-        const {data}=await axiosUserInstance.post('/submitreport',{report,managId,userId})
-        if(data.message){
-            toast(data.message)
-        }else if(data.status){
-            setSend(true)
+        if(!report){
+          toast('Report Cannot Be Null')
+        }else{
+          const userData=localStorage.getItem('userInfo')
+          const userInfo=JSON.parse(userData)
+              const config = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${userInfo.token.token}`,
+                },
+              };
+          const {data}=await axiosUserInstance.post('/submitreport',{report,managId,userId},config)
+          if(data.message){
+              toast(data.message)
+          }else if(data.status){
+              setSend(true)
+          }
         }
     } catch (error) {
         console.log(error.message);

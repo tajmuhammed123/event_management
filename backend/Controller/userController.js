@@ -6,6 +6,8 @@ const Payment=require('../Models/transactionModel')
 const Chat=require('../Models/chatModel')
 const Review=require('../Models/reviewModel')
 const Report=require('../Models/reportModel')
+const Banner=require('../Models/bannerModel')
+const Subscription=require('../Models/subscriptionModel')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 require('dotenv').config()
@@ -86,6 +88,8 @@ const userLogin = async (req, res) => {
             } else {
                 return res.status(404).json({ alert: "Password is wrong", status: false });
             }
+        }else{
+          return res.status(404).json({ alert: "No user found", status: false })
         }
     } catch (error) {
         console.log(error.message);
@@ -94,6 +98,7 @@ const userLogin = async (req, res) => {
 
 const userGoogleLogin=async(req,res)=>{
     try {
+      console.log('hjfj');
         const { name,email, password } = req.body
         const exists=await User.findOne({email:email})
 
@@ -212,11 +217,15 @@ const VerifyPassword=async(req,res)=>{
 
 const homeData=async(req,res)=>{
     try {
+      console.log('new');
+      const manager= await Subscription.find({}).populate('managerId')
+      const managerDataArray = manager.map((subscription) => subscription.managerId);
+        console.log("Array of managerId data:", managerDataArray);
         const homeData=await Manager.find({is_authorized:true, eventData: { $exists: true, $ne: null }})
         console.log(homeData);
-        return res.status(200).json({homeData})
+        return res.status(200).json({homeData:managerDataArray})
     } catch (error) {
-        
+        console.log(error.message);
     }
 }
 
@@ -247,9 +256,13 @@ const detailData=async(req,res)=>{
 const eventList=async(req,res)=>{
     try {
         const name=req.query.name
-        const managers = await Manager.find({
-            [`eventData.events.${name}`]: 'true'
-          },{ 'eventData': 1, '_id': 0 });
+        const page=req.query.page
+        console.log(page,'page');
+        const start=(page-1)*2
+        const end=start+2
+        const managers = await Manager.find(
+          { 'eventData.events': name }
+        ).skip(start).limit(end)
           return res.status(200).json({managers})
     } catch (error) {
         console.log(error.message);
@@ -258,7 +271,9 @@ const eventList=async(req,res)=>{
 
 const managerData=async(req,res)=>{
     try {
+      console.log('reached');
         const id=req.params.id
+        console.log(id);
         const manager=await Manager.findById(id)
         console.log(manager);
         return res.status(200).json({data:manager, status:true})
@@ -272,6 +287,7 @@ const submitBooking=async(req,res)=>{
     try {
         console.log(req.body);
         const data=req.body.eventdata
+        const dates = data.date.map((dateString) => new Date(dateString));
         const booking= new Booking({
             manager_id: data.manager_id,
             user_id: data.user_id,
@@ -281,17 +297,58 @@ const submitBooking=async(req,res)=>{
             event: data.event,
             preffered_dishes: data.preffered_dishes,
             address :data.address,
-            date: data.date,
+            date: dates,
             time: data.time,
             additional_data: data.additional_data
         })
+        const user=await User.findById(data.user_id)
         console.log(booking);
         const bookingdata=await booking.save()
         console.log(req.body);
-        return res.status(200).json({alert:'Booking saved',status:true,data:bookingdata})
+        return res.status(200).json({alert:'Booking saved',status:true,data:bookingdata,user:user})
     } catch (error) {
         console.log(error.message);
     }
+}
+
+const paymentBookingData=async(req,res)=>{
+  try {
+    const {id}=req.params
+    const stripe=new Stripe('sk_test_51NwHkGSEDFbx4uMAi4gaS8gIKK34IfRc6c1ang04n7KDxk5t8rRyid4fKedWCBqlaBUJeKDMczwzhCtPU1nWriaq00ahzBlJ8c')
+    const data=await Booking.findById(id)
+    if(data.is_paid=='paid'){
+      return res.status(403).json({message:'already paid'})
+    }
+    const price=data.advance_amount    
+    const paymentIntent = await stripe.paymentIntents.create({
+            amount: price*100,
+            currency: "inr",
+            automatic_payment_methods: {
+              enabled: true,
+            },
+          });
+          console.log(paymentIntent);
+          res.status(200).json({
+            clientSecret: paymentIntent.client_secret, amount:price})
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+const paymentBookingSuccess=async(req,res)=>{
+  try {
+    console.log('reached');
+    const {id}=req.params
+    console.log(id);
+    await Booking.findByIdAndUpdate(id,{$set:{is_paid:'paid'}},{new:true})
+    const booking=await Booking.findById(id)
+    const manager = await Manager.findById(booking.manager_id);
+    manager.booked_dates = [...manager.booked_dates, ...booking.date];
+    await manager.save()
+    return res.status(200).json({status:true})
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
 // const userPayment = async (req, res) => {
@@ -327,18 +384,9 @@ const submitBooking=async(req,res)=>{
 
 const userPayment=async(req,res)=>{
     try {
-        console.log('hj');
-        const {id}=req.params
-        console.log(id);
-        const managerdata=await Manager.findById(id)
-        const manager=await Manager.findOne({_id:id})
-        console.log(manager);
         const stripe=new Stripe('sk_test_51NwHkGSEDFbx4uMAi4gaS8gIKK34IfRc6c1ang04n7KDxk5t8rRyid4fKedWCBqlaBUJeKDMczwzhCtPU1nWriaq00ahzBlJ8c')
-        let price=manager.eventData.advance_amount
-        console.log(manager.eventData.advance_amount);
-        console.log(manager.eventData);
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: price*100,
+            amount: 500*100,
             currency: "inr",
             automatic_payment_methods: {
               enabled: true,
@@ -355,27 +403,29 @@ const userPayment=async(req,res)=>{
 const paymentSuccess=async(req,res)=>{
     try {
         console.log('fgfg');
-        const {id,mangId}=req.params
-        const bookingdata=await Booking.findByIdAndUpdate(id,{$set:{is_paid:'paid'}},{new:true,upsert:true})
-        const managerdata=await Manager.findById(mangId)
-        const price=managerdata.eventData.advance_amount
-        console.log(price);
-        const data=await Manager.findOne({_id:mangId})
-        console.log(data);
-        const updatedDocument = await User.findOneAndUpdate(
-            { is_admin: true },
-            { $inc: { wallet_amount: price } },
-            { new: true, upsert: true }
-          );
-          const paymentdata= new Payment({
-            userId:bookingdata.user_id,
-            managerId:mangId,
-            bookingId:id,
-            amount:price,
-            status:'paid'
-          })
-          await paymentdata.save()
-          console.log("Updated document:", updatedDocument);
+        const {id}=req.params
+
+        const user=await User.findByIdAndUpdate(id,{$set:{is_paid:true}},{new:true})
+        console.log(user);
+        // const bookingdata=await Booking.findByIdAndUpdate(id,{$set:{is_paid:'paid'}},{new:true,upsert:true})
+        // const managerdata=await Manager.findById(mangId)
+        // const price=managerdata.eventData.advance_amount
+        // console.log(price);
+        // const data=await Manager.findOne({_id:mangId})
+        // console.log(data);
+        // const updatedDocument = await User.findOneAndUpdate(
+        //     { is_admin: true },
+        //     { $inc: { wallet_amount: price } },
+        //     { new: true, upsert: true }
+        //   );
+        //   const paymentdata= new Payment({
+        //     userId:bookingdata.user_id,
+        //     managerId:mangId,
+        //     bookingId:id,
+        //     amount:price,
+        //     status:'paid'
+        //   })
+        //   await paymentdata.save()
         res.status(200).json({status:true})
 
     } catch (error) {
@@ -563,6 +613,15 @@ const accessChat = async (req, res) => {
     }
   }
 
+  const bannerData=async(req,res)=>{
+    try {
+      const banner=await Banner.find({})
+      res.status(200).json({banner})
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   const updateUser=async(req,res)=>{
     try {
       const cloudinarydata = await uploadToCloudinary(req.file.path, "profile_img");
@@ -578,7 +637,7 @@ console.log(cloudinarydata);
     {
       $set: {
         name: data.name,
-        mob: mob, // Use the parsed "mob" value as an integer
+        mob: mob,
         profile_img: cloudinarydata.url,
       }
     }
@@ -587,7 +646,7 @@ console.log(cloudinarydata);
     { _id: req.body.id }
   );
   console.log(user);
-  return res.status(200).json({status:true})
+  return res.status(200).json({status:true,user:user})
 
     } catch (error) {
       console.log(error.message);
@@ -607,6 +666,8 @@ module.exports={
     eventList,
     managerData,
     submitBooking,
+    paymentBookingData,
+    paymentBookingSuccess,
     userPayment,
     paymentSuccess,
     orderHistory,
@@ -616,5 +677,6 @@ module.exports={
     searchUsers,
     submitReview,
     submitReport,
+    bannerData,
     updateUser
 }

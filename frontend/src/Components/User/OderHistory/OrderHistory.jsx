@@ -93,103 +93,68 @@ function OrderHistory() {
             </tr>
           </thead>
           <tbody>
-            {data.map(
-              (item,index) => {
-                const isLast = index === data.length - 1;
-                const classes = isLast
-                  ? "p-4"
-                  : "p-4 border-b border-blue-gray-50";
-                console.log(item);
-                let time=new Date(item.date).toLocaleDateString()
-                return (
-                  <tr key={item.event_name}>
-                    <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-bold"
-                        >
-                          {item.event_name}
-                        </Typography>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {item.mob}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {time}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <div className="w-max">
-                        <Chip
-                          size="sm"
-                          variant="ghost"
-                          value={item.is_paid}
-                          color={
-                            item.is_paid === "paid"
-                              ? "green"
-                              : item.is_paid === "not paid"
-                              ? "amber"
-                              : "red"
-                          }
-                        />
-                      </div>
-                    </td>
-                    {/* <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-12 rounded-md border border-blue-gray-50 p-1">
-                          <Avatar
-                            src={
-                              account === "visa"
-                                ? "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/logos/visa.png"
-                                : "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/logos/mastercard.png"
-                            }
-                            size="sm"
-                            alt={account}
-                            variant="square"
-                            className="h-full w-full object-contain p-1"
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal capitalize"
-                          >
-                            {account.split("-").join(" ")} {accountNumber}
-                          </Typography>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal opacity-70"
-                          >
-                            {expiry}
-                          </Typography>
-                        </div>
-                      </div>
-                    </td> */}
-                    <td className={classes}>
-                        {item.is_paid === "paid" ?<Tooltip content="Edit User">
-                          <CancelButton id={item._id} />
-                        </Tooltip>:<></>}
-                    </td>
-                  </tr>
-                );
-              },
-            )}
+          {data.map((item, index) => {
+  const isLast = index === data.length - 1;
+  const classes = isLast
+    ? "p-4"
+    : "p-4 border-b border-blue-gray-50";
+  console.log(item);
+
+  return (
+    <tr key={item.event_name}>
+      <td className={classes}>
+        <div className="flex items-center gap-3">
+          <Typography variant="small" color="blue-gray" className="font-bold">
+            {item.event_name}
+          </Typography>
+        </div>
+      </td>
+      <td className={classes}>
+        <Typography variant="small" color="blue-gray" className="font-normal">
+          {item.mob}
+        </Typography>
+      </td>
+      <td className={classes}>
+        {item.date.map((date, dateIndex) => (
+          <Typography
+            key={dateIndex}
+            variant="small"
+            color="blue-gray"
+            className="font-normal"
+          >
+            {new Date(date).toLocaleDateString()}
+          </Typography>
+        ))}
+      </td>
+      <td className={classes}>
+        <div className="w-max">
+          <Chip
+            size="sm"
+            variant="ghost"
+            value={item.is_paid}
+            color={
+              item.is_paid === "paid"
+                ? "green"
+                : item.is_paid === "not paid"
+                ? "amber"
+                : "red"
+            }
+          />
+        </div>
+      </td>
+      <td className={classes}>
+        {item.is_paid === "paid" ? (
+          <Tooltip content="Edit User">
+            <CancelButton id={item._id} />
+          </Tooltip>
+        ) : (
+          <></>
+        )}
+      </td>
+    </tr>
+  );
+})}
+
           </tbody>
         </table>
       </CardBody>

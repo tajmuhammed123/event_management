@@ -34,12 +34,21 @@ import { Spinner } from "@chakra-ui/spinner";
 import { ChatState } from "../Context/ChatProvider";
 import UserList from "../Users/UserList";
 import { axiosManagerInstance, axiosUserInstance } from '../../../../../Constants/axios';
+import { toast } from 'react-toastify';
 
 function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
+
+  const GenerateError = (err) => {
+    toast.error(err, {
+      position: 'top-center',
+      theme: 'colored',
+      autoClose: 3000
+    });
+  };
 
   const {
     setSelectedChat,
@@ -51,7 +60,6 @@ function SideDrawer() {
   } = ChatState();
   console.log(user);
 
-  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
 
@@ -64,13 +72,7 @@ function SideDrawer() {
 
   const handleSearch = async () => {
     if (!search) {
-      toast({
-        title: "Please Enter something in search",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top-left",
-      });
+      GenerateError("Please enter something in search");
       return;
     }
 
@@ -88,14 +90,7 @@ function SideDrawer() {
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
+      GenerateError("Error Occured!,Failed to Load the Messages");
     }
   };
 
@@ -123,14 +118,7 @@ function SideDrawer() {
       setLoadingChat(false);
       onClose();
     } catch (error) {
-      toast({
-        title: "Error fetching the chat",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
+      GenerateError("Error Occured!,Failed to Load the Messages");
     }
   };
 

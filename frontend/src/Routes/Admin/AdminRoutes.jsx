@@ -8,6 +8,8 @@ import UserData from '../../Components/Admin/UserData/UserData'
 import EventCategory from '../../Components/Admin/Categories/eventCategory'
 import { Report } from '../../Components/Admin/Reports/Report'
 import { Detail } from '../../Components/Admin/Reports/Detail'
+import BannerList from '../../Components/Admin/Banner/BannerList'
+import AddBanner from '../../Components/Admin/Banner/AddBanner'
 
 let routeObj={
   dashboard:'/dashboard',
@@ -16,6 +18,8 @@ let routeObj={
   eventcategorey:'/addeventcategorey',
   report:'/reportdata',
   detailreport:'/reportdetails/:id',
+  bannerlist:'/bannerlist',
+  addbanner:'/addbanner/:id',
 }
 
 function AdminRoutes() {
@@ -33,6 +37,8 @@ function AdminRoutes() {
               <Route path={routeObj.eventcategorey} element={ <EventCategory/> } />
               <Route path={routeObj.report} element={ <Report/> } />
               <Route path={routeObj.detailreport} element={ <Detail/> } />
+              <Route path={routeObj.bannerlist} element={ <BannerList/> } />
+              <Route path={routeObj.addbanner} element={ <AddBanner/> } />
             </Route>
           </Route>
         </Routes>

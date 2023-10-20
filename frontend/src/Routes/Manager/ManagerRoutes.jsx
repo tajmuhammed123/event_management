@@ -11,6 +11,10 @@ import LayOut from '../../Components/Manager/LayOut/LayOut'
 import { Profile } from '../../Components/Manager/Profile/Profile'
 import ChatList from '../../Components/Manager/Chat/ChatList'
 import { EditManager } from '../../Components/Manager/EditManager/EditManager'
+import { Subscription } from '../../Components/Manager/Subscription/subscription'
+import Payment from '../../Components/Manager/Subscription/Payment/Payment'
+import Success from '../../Components/Manager/Subscription/Payment/Success'
+import { BookedUser } from '../../Components/Manager/Bookings/BookedUser'
 
 function ManagerRoutes() {
   let routeObj={
@@ -21,7 +25,11 @@ function ManagerRoutes() {
     profile:'/profile',
     managerverify:'/managerverify/:id',
     chat:'/chat',
-    editmanager:'/manageredit/:id'
+    editmanager:'/manageredit/:id',
+    subscription:'/subscription',
+    subscriptionpayment:'/subscriptionpayment/:method',
+    subscriptionsuccess:'/subscriptionsuccess',
+    bookinguser:'/bookinguser/:id',
   }
   return (
     <Routes>
@@ -35,6 +43,10 @@ function ManagerRoutes() {
           <Route path={routeObj.profile} element={<ManagerProtect><Profile /></ManagerProtect>}></Route>
           <Route path={routeObj.chat} element={<ChatList />}></Route>
           <Route path={routeObj.editmanager} element={<EditManager />}></Route>
+          <Route path={routeObj.subscription} element={<Subscription />}></Route>
+          <Route path={routeObj.subscriptionpayment} element={<Payment />}></Route>
+          <Route path={routeObj.subscriptionsuccess} element={<Success />}></Route>
+          <Route path={routeObj.bookinguser} element={<BookedUser />}></Route>
         </Route>
     </Routes>
   )

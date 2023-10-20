@@ -6,8 +6,9 @@ const bookingSchema=new mongoose.Schema({
         required:true
     },
     user_id:{
-        type:String,
-        required:true
+        type:mongoose.Schema.Types.ObjectId,
+        required:true,
+        ref:'user'
     },
     event_name:{
         type:String,
@@ -18,7 +19,7 @@ const bookingSchema=new mongoose.Schema({
         required:true
     },
     event:{
-        type:Array,
+        type:String,
         required:true
     },
     preffered_dishes:{
@@ -29,16 +30,23 @@ const bookingSchema=new mongoose.Schema({
         type:String,
         required:true
     },
-    date:{
-        type:Date,
-        required:true
-    },
+    date: {
+        type: [Date],
+        required: true,
+      },
     time:{
         type:String,
         required:true
     },
     additional_data:{
         type:String,
+    },
+    advance_amount:{
+        type:Number
+    },
+    is_confirmed:{
+        type:Boolean,
+        default:false
     },
     is_paid:{
         type:String,
